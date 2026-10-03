@@ -1,0 +1,9 @@
+[mcp_servers.headroom]
+command = "C:\\Users\\Ayak4-PC\\.headroom\\venv\\Scripts\\headroom.exe"
+args = ["mcp", "serve"]
+enabled = true
+required = false
+startup_timeout_sec = 30
+tool_timeout_sec = 120
+default_tools_approval_mode = "auto"
+enabled_tools = ["headroom_compress", "headroom_retrieve", "headroom_stats"]

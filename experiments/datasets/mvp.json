@@ -1,0 +1,130 @@
+{
+  "version": "1.0.0",
+  "sequences": [
+    {
+      "sequence_id": "preference-001",
+      "category": "preference",
+      "description": "取回使用者的回答語言偏好",
+      "memories": [
+        {"key": "language", "type": "semantic", "content": "回答時請使用繁體中文"},
+        {"key": "format", "type": "semantic", "content": "回答內容偏好簡潔段落"}
+      ],
+      "queries": [
+        {"id": "q1", "input": "我偏好使用哪一種中文？", "expected_memory_keys": ["language"], "expected_answer_contains": ["繁體中文"]}
+      ]
+    },
+    {
+      "sequence_id": "repetition-001",
+      "category": "repetition",
+      "description": "同義改寫仍應找到授權限制",
+      "memories": [
+        {"key": "license", "type": "semantic", "content": "專案只能使用 MIT 或 Apache-2.0 授權套件"},
+        {"key": "region", "type": "semantic", "content": "預設部署區域是新加坡"}
+      ],
+      "queries": [
+        {"id": "q1", "input": "相依套件允許哪些開源授權？", "expected_memory_keys": ["license"], "expected_answer_contains": ["MIT", "Apache-2.0"]}
+      ]
+    },
+    {
+      "sequence_id": "update-001",
+      "category": "update",
+      "description": "新部署地點取代舊地點",
+      "memories": [
+        {"key": "old_region", "type": "semantic", "content": "部署區域是東京", "status": "superseded"},
+        {"key": "new_region", "type": "semantic", "content": "部署區域已改為新加坡", "supersedes": "old_region"}
+      ],
+      "queries": [
+        {"id": "q1", "input": "目前要部署在哪個區域？", "expected_memory_keys": ["new_region"], "forbidden_memory_keys": ["old_region"], "expected_answer_contains": ["新加坡"]}
+      ]
+    },
+    {
+      "sequence_id": "long-horizon-001",
+      "category": "long_horizon",
+      "description": "跨多個任務保留早期的架構決策",
+      "memories": [
+        {"key": "source_of_truth", "type": "episodic", "content": "專案決定使用 SQLite 作為 memory source of truth"},
+        {"key": "ui", "type": "episodic", "content": "展示介面預計使用 Streamlit"},
+        {"key": "deploy", "type": "episodic", "content": "部署預計使用 Docker"}
+      ],
+      "queries": [
+        {"id": "q1", "input": "哪一個儲存層是記憶的主要事實來源？", "expected_memory_keys": ["source_of_truth"], "expected_answer_contains": ["SQLite"]}
+      ]
+    },
+    {
+      "sequence_id": "conflict-001",
+      "category": "conflict",
+      "description": "低信心的衝突記憶不應勝過已確認決策",
+      "memories": [
+        {"key": "confirmed_db", "type": "semantic", "content": "Metadata database 使用 SQLite", "confidence": 1.0},
+        {"key": "polluted_db", "type": "semantic", "content": "Metadata database 使用 MongoDB", "confidence": 0.2, "pollution_penalty": 0.5}
+      ],
+      "queries": [
+        {"id": "q1", "input": "Metadata 要保存在哪個資料庫？", "expected_memory_keys": ["confirmed_db"], "forbidden_memory_keys": ["polluted_db"], "expected_answer_contains": ["SQLite"]}
+      ]
+    },
+    {
+      "sequence_id": "irrelevant-001",
+      "category": "irrelevant",
+      "description": "大量無關記憶中仍應找到 token budget 決策",
+      "memories": [
+        {"key": "budget", "type": "semantic", "content": "Context compression 第一版使用 token budget selection"},
+        {"key": "color", "type": "working", "content": "簡報使用深色背景"},
+        {"key": "meeting", "type": "episodic", "content": "星期五下午曾整理 README"},
+        {"key": "author", "type": "semantic", "content": "專案作者是陳格洋"}
+      ],
+      "queries": [
+        {"id": "q1", "input": "第一版如何壓縮 context？", "expected_memory_keys": ["budget"], "expected_answer_contains": ["token budget"]}
+      ]
+    },
+    {
+      "sequence_id": "scope-001",
+      "category": "scope_isolation",
+      "description": "不同專案 scope 不可互相取回資料",
+      "memories": [
+        {"key": "alpha", "scope": "project-alpha", "type": "semantic", "content": "Alpha 專案使用 Chroma"},
+        {"key": "beta", "scope": "project-beta", "type": "semantic", "content": "Beta 專案使用 Qdrant"}
+      ],
+      "queries": [
+        {"id": "q1", "scope": "project-alpha", "input": "這個專案使用哪個 vector backend？", "expected_memory_keys": ["alpha"], "forbidden_memory_keys": ["beta"], "expected_answer_contains": ["Chroma"]}
+      ]
+    },
+    {
+      "sequence_id": "repetition-002",
+      "category": "repetition",
+      "description": "英文查詢的詞彙改寫基準",
+      "memories": [
+        {"key": "cache_ttl", "type": "semantic", "content": "Semantic cache entries expire using a configurable TTL"},
+        {"key": "cache_metric", "type": "semantic", "content": "Cache hit rate is recorded for every benchmark run"}
+      ],
+      "queries": [
+        {"id": "q1", "input": "How do cached responses expire?", "expected_memory_keys": ["cache_ttl"], "expected_answer_contains": ["TTL"]}
+      ]
+    },
+    {
+      "sequence_id": "preference-002",
+      "category": "preference",
+      "description": "取回程式碼風格偏好",
+      "memories": [
+        {"key": "style", "type": "semantic", "content": "程式碼註解只寫在不容易理解的地方"},
+        {"key": "tests", "type": "semantic", "content": "每個核心 policy 都需要離線測試"}
+      ],
+      "queries": [
+        {"id": "q1", "input": "這個專案的註解原則是什麼？", "expected_memory_keys": ["style"], "expected_answer_contains": ["不容易理解"]}
+      ]
+    },
+    {
+      "sequence_id": "long-horizon-002",
+      "category": "long_horizon",
+      "description": "取回較早定義的非目標",
+      "memories": [
+        {"key": "non_goal", "type": "semantic", "content": "MVP 不實作 Graph Memory 或多 Agent orchestration"},
+        {"key": "mvp", "type": "semantic", "content": "MVP 包含 memory lifecycle、semantic cache 與 evaluation"},
+        {"key": "api", "type": "episodic", "content": "API 預計使用 FastAPI"}
+      ],
+      "queries": [
+        {"id": "q1", "input": "第一版刻意不做哪些複雜功能？", "expected_memory_keys": ["non_goal"], "expected_answer_contains": ["Graph Memory", "多 Agent"]}
+      ]
+    }
+  ]
+}
+

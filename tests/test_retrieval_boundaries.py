@@ -40,9 +40,7 @@ class RetrievalBoundaryTests(unittest.TestCase):
         service = RetrievalService(
             store=store, embedding_provider=DeterministicHashEmbedding(), vector_index=index
         )
-        response = service.retrieve(
-            "memory", scope_id="alpha", memory_types={MemoryType.SEMANTIC}
-        )
+        response = service.retrieve("memory", scope_id="alpha", memory_types={MemoryType.SEMANTIC})
         self.assertEqual([c.memory.id for c in response.candidates], [allowed.id])
         self.assertEqual(response.selected_memory_ids, [allowed.id])
         for item, expected_count in [(allowed, 1), (foreign, 0), (wrong_type, 0)]:
@@ -59,13 +57,16 @@ class RetrievalBoundaryTests(unittest.TestCase):
                     memory_type=MemoryType.SEMANTIC, scope_id="alpha", content="memory"
                 )
                 index.upsert(
-                    memory_id=item.id, scope_id="alpha", memory_type=item.memory_type,
-                    model_id="test", vector=[1.0],
+                    memory_id=item.id,
+                    scope_id="alpha",
+                    memory_type=item.memory_type,
+                    model_id="test",
+                    vector=[1.0],
                 )
                 self.assertEqual(store.list_active(scope_id="alpha", memory_types=set()), [])
-                self.assertEqual(index.search(
-                    [1.0], scope_id="alpha", model_id="test", memory_types=set()
-                ), [])
+                self.assertEqual(
+                    index.search([1.0], scope_id="alpha", model_id="test", memory_types=set()), []
+                )
                 self.assertEqual(len(store.list_active(scope_id="alpha")), 1)
             finally:
                 index.close()
@@ -83,7 +84,10 @@ class RetrievalBoundaryTests(unittest.TestCase):
 
     def test_zero_weight_ablation_is_supported(self) -> None:
         config = RetrievalConfig(
-            similarity_weight=1.0, recency_weight=0.0, importance_weight=0.0,
-            confidence_weight=0.0, frequency_weight=0.0,
+            similarity_weight=1.0,
+            recency_weight=0.0,
+            importance_weight=0.0,
+            confidence_weight=0.0,
+            frequency_weight=0.0,
         )
         self.assertEqual(config.similarity_weight, 1.0)

@@ -1,0 +1,1115 @@
+{
+  "version": "challenge-1.1.0",
+  "provenance": "Authored synthetic stress cases, not real users or external held-out data.",
+  "fixed_now": "2026-10-03T00:00:00+00:00",
+  "timestamp_rule": "Equal-age records use insertion order: later writes/accesses are newer.",
+  "split_note": "Disjoint vocabulary pairs; same templates, not independent distributions.",
+  "cases": [
+    {
+      "id": "development-long_history",
+      "split": "development",
+      "category": "long_history",
+      "query": "atlas deployment region",
+      "memories": [
+        {
+          "key": "region",
+          "content": "atlas deployment region tokyo",
+          "age_days": 90
+        },
+        {
+          "key": "noise-0",
+          "content": "atlas lunch meeting agenda item 0"
+        },
+        {
+          "key": "noise-1",
+          "content": "atlas lunch meeting agenda item 1"
+        },
+        {
+          "key": "noise-2",
+          "content": "atlas lunch meeting agenda item 2"
+        },
+        {
+          "key": "noise-3",
+          "content": "atlas lunch meeting agenda item 3"
+        },
+        {
+          "key": "noise-4",
+          "content": "atlas lunch meeting agenda item 4"
+        },
+        {
+          "key": "noise-5",
+          "content": "atlas lunch meeting agenda item 5"
+        },
+        {
+          "key": "noise-6",
+          "content": "atlas lunch meeting agenda item 6"
+        },
+        {
+          "key": "noise-7",
+          "content": "atlas lunch meeting agenda item 7"
+        },
+        {
+          "key": "noise-8",
+          "content": "atlas lunch meeting agenda item 8"
+        },
+        {
+          "key": "noise-9",
+          "content": "atlas lunch meeting agenda item 9"
+        },
+        {
+          "key": "noise-10",
+          "content": "atlas lunch meeting agenda item 10"
+        },
+        {
+          "key": "noise-11",
+          "content": "atlas lunch meeting agenda item 11"
+        },
+        {
+          "key": "noise-12",
+          "content": "atlas lunch meeting agenda item 12"
+        },
+        {
+          "key": "noise-13",
+          "content": "atlas lunch meeting agenda item 13"
+        },
+        {
+          "key": "noise-14",
+          "content": "atlas lunch meeting agenda item 14"
+        }
+      ],
+      "expected": [
+        "region"
+      ],
+      "forbidden": []
+    },
+    {
+      "id": "development-three_required",
+      "split": "development",
+      "category": "three_required",
+      "query": "atlas deployment region database runtime",
+      "memories": [
+        {
+          "key": "region",
+          "content": "atlas deployment region tokyo",
+          "age_days": 90
+        },
+        {
+          "key": "database",
+          "content": "atlas deployment database sqlite",
+          "age_days": 60
+        },
+        {
+          "key": "noise-0",
+          "content": "atlas lunch meeting agenda item 0"
+        },
+        {
+          "key": "noise-1",
+          "content": "atlas lunch meeting agenda item 1"
+        },
+        {
+          "key": "noise-2",
+          "content": "atlas lunch meeting agenda item 2"
+        },
+        {
+          "key": "noise-3",
+          "content": "atlas lunch meeting agenda item 3"
+        },
+        {
+          "key": "noise-4",
+          "content": "atlas lunch meeting agenda item 4"
+        },
+        {
+          "key": "noise-5",
+          "content": "atlas lunch meeting agenda item 5"
+        },
+        {
+          "key": "noise-6",
+          "content": "atlas lunch meeting agenda item 6"
+        },
+        {
+          "key": "noise-7",
+          "content": "atlas lunch meeting agenda item 7"
+        },
+        {
+          "key": "noise-8",
+          "content": "atlas lunch meeting agenda item 8"
+        },
+        {
+          "key": "noise-9",
+          "content": "atlas lunch meeting agenda item 9"
+        },
+        {
+          "key": "noise-10",
+          "content": "atlas lunch meeting agenda item 10"
+        },
+        {
+          "key": "noise-11",
+          "content": "atlas lunch meeting agenda item 11"
+        },
+        {
+          "key": "noise-12",
+          "content": "atlas lunch meeting agenda item 12"
+        },
+        {
+          "key": "noise-13",
+          "content": "atlas lunch meeting agenda item 13"
+        },
+        {
+          "key": "noise-14",
+          "content": "atlas lunch meeting agenda item 14"
+        },
+        {
+          "key": "runtime",
+          "content": "atlas deployment runtime python",
+          "age_days": 1
+        }
+      ],
+      "expected": [
+        "region",
+        "database",
+        "runtime"
+      ],
+      "forbidden": []
+    },
+    {
+      "id": "development-hot_pollution",
+      "split": "development",
+      "category": "hot_pollution",
+      "query": "atlas deployment database configuration",
+      "memories": [
+        {
+          "key": "correct",
+          "content": "atlas deployment database configuration sqlite",
+          "age_days": 30,
+          "access_age_days": 30,
+          "access_count": 1
+        },
+        {
+          "key": "wrong-0",
+          "content": "atlas deployment database configuration mysql obsolete 0",
+          "age_days": 1,
+          "access_age_days": 0,
+          "access_count": 50
+        },
+        {
+          "key": "wrong-1",
+          "content": "atlas deployment database configuration mysql obsolete 1",
+          "age_days": 1,
+          "access_age_days": 0,
+          "access_count": 51
+        },
+        {
+          "key": "wrong-2",
+          "content": "atlas deployment database configuration mysql obsolete 2",
+          "age_days": 1,
+          "access_age_days": 0,
+          "access_count": 52
+        },
+        {
+          "key": "wrong-3",
+          "content": "atlas deployment database configuration mysql obsolete 3",
+          "age_days": 1,
+          "access_age_days": 0,
+          "access_count": 53
+        }
+      ],
+      "expected": [
+        "correct"
+      ],
+      "forbidden": [
+        "wrong-0",
+        "wrong-1",
+        "wrong-2",
+        "wrong-3"
+      ]
+    },
+    {
+      "id": "development-fresh_correction",
+      "split": "development",
+      "category": "fresh_correction",
+      "query": "atlas deployment database configuration",
+      "memories": [
+        {
+          "key": "wrong-0",
+          "content": "atlas deployment database configuration mysql obsolete 0",
+          "age_days": 30,
+          "access_age_days": 20,
+          "access_count": 50
+        },
+        {
+          "key": "wrong-1",
+          "content": "atlas deployment database configuration mysql obsolete 1",
+          "age_days": 30,
+          "access_age_days": 20,
+          "access_count": 51
+        },
+        {
+          "key": "wrong-2",
+          "content": "atlas deployment database configuration mysql obsolete 2",
+          "age_days": 30,
+          "access_age_days": 20,
+          "access_count": 52
+        },
+        {
+          "key": "wrong-3",
+          "content": "atlas deployment database configuration mysql obsolete 3",
+          "age_days": 30,
+          "access_age_days": 20,
+          "access_count": 53
+        },
+        {
+          "key": "correct",
+          "content": "atlas deployment database configuration sqlite",
+          "age_days": 1,
+          "access_age_days": 0,
+          "access_count": 1
+        }
+      ],
+      "expected": [
+        "correct"
+      ],
+      "forbidden": [
+        "wrong-0",
+        "wrong-1",
+        "wrong-2",
+        "wrong-3"
+      ]
+    },
+    {
+      "id": "development-cold_important",
+      "split": "development",
+      "category": "cold_important",
+      "query": "atlas emergency recovery key",
+      "memories": [
+        {
+          "key": "recovery",
+          "content": "atlas emergency recovery key vault",
+          "age_days": 90,
+          "access_age_days": 90,
+          "access_count": 0,
+          "importance": 1.0
+        },
+        {
+          "key": "noise-0",
+          "content": "atlas daily routine meeting 0",
+          "age_days": 1,
+          "access_age_days": 0,
+          "access_count": 10
+        },
+        {
+          "key": "noise-1",
+          "content": "atlas daily routine meeting 1",
+          "age_days": 1,
+          "access_age_days": 0,
+          "access_count": 11
+        },
+        {
+          "key": "noise-2",
+          "content": "atlas daily routine meeting 2",
+          "age_days": 1,
+          "access_age_days": 0,
+          "access_count": 12
+        },
+        {
+          "key": "noise-3",
+          "content": "atlas daily routine meeting 3",
+          "age_days": 1,
+          "access_age_days": 0,
+          "access_count": 13
+        },
+        {
+          "key": "noise-4",
+          "content": "atlas daily routine meeting 4",
+          "age_days": 1,
+          "access_age_days": 0,
+          "access_count": 14
+        },
+        {
+          "key": "noise-5",
+          "content": "atlas daily routine meeting 5",
+          "age_days": 1,
+          "access_age_days": 0,
+          "access_count": 15
+        },
+        {
+          "key": "noise-6",
+          "content": "atlas daily routine meeting 6",
+          "age_days": 1,
+          "access_age_days": 0,
+          "access_count": 16
+        },
+        {
+          "key": "noise-7",
+          "content": "atlas daily routine meeting 7",
+          "age_days": 1,
+          "access_age_days": 0,
+          "access_count": 17
+        },
+        {
+          "key": "noise-8",
+          "content": "atlas daily routine meeting 8",
+          "age_days": 1,
+          "access_age_days": 0,
+          "access_count": 18
+        },
+        {
+          "key": "noise-9",
+          "content": "atlas daily routine meeting 9",
+          "age_days": 1,
+          "access_age_days": 0,
+          "access_count": 19
+        }
+      ],
+      "expected": [
+        "recovery"
+      ],
+      "forbidden": []
+    },
+    {
+      "id": "development-expired_candidates",
+      "split": "development",
+      "category": "expired_candidates",
+      "query": "atlas deployment database configuration mysql",
+      "memories": [
+        {
+          "key": "expired-0",
+          "content": "atlas deployment database configuration mysql 0",
+          "age_days": 30,
+          "expired": true
+        },
+        {
+          "key": "expired-1",
+          "content": "atlas deployment database configuration mysql 1",
+          "age_days": 30,
+          "expired": true
+        },
+        {
+          "key": "expired-2",
+          "content": "atlas deployment database configuration mysql 2",
+          "age_days": 30,
+          "expired": true
+        },
+        {
+          "key": "expired-3",
+          "content": "atlas deployment database configuration mysql 3",
+          "age_days": 30,
+          "expired": true
+        },
+        {
+          "key": "expired-4",
+          "content": "atlas deployment database configuration mysql 4",
+          "age_days": 30,
+          "expired": true
+        },
+        {
+          "key": "expired-5",
+          "content": "atlas deployment database configuration mysql 5",
+          "age_days": 30,
+          "expired": true
+        },
+        {
+          "key": "expired-6",
+          "content": "atlas deployment database configuration mysql 6",
+          "age_days": 30,
+          "expired": true
+        },
+        {
+          "key": "expired-7",
+          "content": "atlas deployment database configuration mysql 7",
+          "age_days": 30,
+          "expired": true
+        },
+        {
+          "key": "expired-8",
+          "content": "atlas deployment database configuration mysql 8",
+          "age_days": 30,
+          "expired": true
+        },
+        {
+          "key": "expired-9",
+          "content": "atlas deployment database configuration mysql 9",
+          "age_days": 30,
+          "expired": true
+        },
+        {
+          "key": "expired-10",
+          "content": "atlas deployment database configuration mysql 10",
+          "age_days": 30,
+          "expired": true
+        },
+        {
+          "key": "expired-11",
+          "content": "atlas deployment database configuration mysql 11",
+          "age_days": 30,
+          "expired": true
+        },
+        {
+          "key": "expired-12",
+          "content": "atlas deployment database configuration mysql 12",
+          "age_days": 30,
+          "expired": true
+        },
+        {
+          "key": "expired-13",
+          "content": "atlas deployment database configuration mysql 13",
+          "age_days": 30,
+          "expired": true
+        },
+        {
+          "key": "expired-14",
+          "content": "atlas deployment database configuration mysql 14",
+          "age_days": 30,
+          "expired": true
+        },
+        {
+          "key": "expired-15",
+          "content": "atlas deployment database configuration mysql 15",
+          "age_days": 30,
+          "expired": true
+        },
+        {
+          "key": "expired-16",
+          "content": "atlas deployment database configuration mysql 16",
+          "age_days": 30,
+          "expired": true
+        },
+        {
+          "key": "expired-17",
+          "content": "atlas deployment database configuration mysql 17",
+          "age_days": 30,
+          "expired": true
+        },
+        {
+          "key": "expired-18",
+          "content": "atlas deployment database configuration mysql 18",
+          "age_days": 30,
+          "expired": true
+        },
+        {
+          "key": "expired-19",
+          "content": "atlas deployment database configuration mysql 19",
+          "age_days": 30,
+          "expired": true
+        },
+        {
+          "key": "expired-20",
+          "content": "atlas deployment database configuration mysql 20",
+          "age_days": 30,
+          "expired": true
+        },
+        {
+          "key": "expired-21",
+          "content": "atlas deployment database configuration mysql 21",
+          "age_days": 30,
+          "expired": true
+        },
+        {
+          "key": "expired-22",
+          "content": "atlas deployment database configuration mysql 22",
+          "age_days": 30,
+          "expired": true
+        },
+        {
+          "key": "expired-23",
+          "content": "atlas deployment database configuration mysql 23",
+          "age_days": 30,
+          "expired": true
+        },
+        {
+          "key": "expired-24",
+          "content": "atlas deployment database configuration mysql 24",
+          "age_days": 30,
+          "expired": true
+        },
+        {
+          "key": "correct",
+          "content": "atlas deployment database configuration sqlite",
+          "age_days": 1
+        }
+      ],
+      "expected": [
+        "correct"
+      ],
+      "forbidden": [
+        "expired-0",
+        "expired-1",
+        "expired-2",
+        "expired-3",
+        "expired-4",
+        "expired-5",
+        "expired-6",
+        "expired-7",
+        "expired-8",
+        "expired-9",
+        "expired-10",
+        "expired-11",
+        "expired-12",
+        "expired-13",
+        "expired-14",
+        "expired-15",
+        "expired-16",
+        "expired-17",
+        "expired-18",
+        "expired-19",
+        "expired-20",
+        "expired-21",
+        "expired-22",
+        "expired-23",
+        "expired-24"
+      ]
+    },
+    {
+      "id": "evaluation-long_history",
+      "split": "evaluation",
+      "category": "long_history",
+      "query": "beacon deployment region",
+      "memories": [
+        {
+          "key": "region",
+          "content": "beacon deployment region tokyo",
+          "age_days": 90
+        },
+        {
+          "key": "noise-0",
+          "content": "beacon lunch meeting agenda item 0"
+        },
+        {
+          "key": "noise-1",
+          "content": "beacon lunch meeting agenda item 1"
+        },
+        {
+          "key": "noise-2",
+          "content": "beacon lunch meeting agenda item 2"
+        },
+        {
+          "key": "noise-3",
+          "content": "beacon lunch meeting agenda item 3"
+        },
+        {
+          "key": "noise-4",
+          "content": "beacon lunch meeting agenda item 4"
+        },
+        {
+          "key": "noise-5",
+          "content": "beacon lunch meeting agenda item 5"
+        },
+        {
+          "key": "noise-6",
+          "content": "beacon lunch meeting agenda item 6"
+        },
+        {
+          "key": "noise-7",
+          "content": "beacon lunch meeting agenda item 7"
+        },
+        {
+          "key": "noise-8",
+          "content": "beacon lunch meeting agenda item 8"
+        },
+        {
+          "key": "noise-9",
+          "content": "beacon lunch meeting agenda item 9"
+        },
+        {
+          "key": "noise-10",
+          "content": "beacon lunch meeting agenda item 10"
+        },
+        {
+          "key": "noise-11",
+          "content": "beacon lunch meeting agenda item 11"
+        },
+        {
+          "key": "noise-12",
+          "content": "beacon lunch meeting agenda item 12"
+        },
+        {
+          "key": "noise-13",
+          "content": "beacon lunch meeting agenda item 13"
+        },
+        {
+          "key": "noise-14",
+          "content": "beacon lunch meeting agenda item 14"
+        }
+      ],
+      "expected": [
+        "region"
+      ],
+      "forbidden": []
+    },
+    {
+      "id": "evaluation-three_required",
+      "split": "evaluation",
+      "category": "three_required",
+      "query": "beacon deployment region database runtime",
+      "memories": [
+        {
+          "key": "region",
+          "content": "beacon deployment region tokyo",
+          "age_days": 90
+        },
+        {
+          "key": "database",
+          "content": "beacon deployment database sqlite",
+          "age_days": 60
+        },
+        {
+          "key": "noise-0",
+          "content": "beacon lunch meeting agenda item 0"
+        },
+        {
+          "key": "noise-1",
+          "content": "beacon lunch meeting agenda item 1"
+        },
+        {
+          "key": "noise-2",
+          "content": "beacon lunch meeting agenda item 2"
+        },
+        {
+          "key": "noise-3",
+          "content": "beacon lunch meeting agenda item 3"
+        },
+        {
+          "key": "noise-4",
+          "content": "beacon lunch meeting agenda item 4"
+        },
+        {
+          "key": "noise-5",
+          "content": "beacon lunch meeting agenda item 5"
+        },
+        {
+          "key": "noise-6",
+          "content": "beacon lunch meeting agenda item 6"
+        },
+        {
+          "key": "noise-7",
+          "content": "beacon lunch meeting agenda item 7"
+        },
+        {
+          "key": "noise-8",
+          "content": "beacon lunch meeting agenda item 8"
+        },
+        {
+          "key": "noise-9",
+          "content": "beacon lunch meeting agenda item 9"
+        },
+        {
+          "key": "noise-10",
+          "content": "beacon lunch meeting agenda item 10"
+        },
+        {
+          "key": "noise-11",
+          "content": "beacon lunch meeting agenda item 11"
+        },
+        {
+          "key": "noise-12",
+          "content": "beacon lunch meeting agenda item 12"
+        },
+        {
+          "key": "noise-13",
+          "content": "beacon lunch meeting agenda item 13"
+        },
+        {
+          "key": "noise-14",
+          "content": "beacon lunch meeting agenda item 14"
+        },
+        {
+          "key": "runtime",
+          "content": "beacon deployment runtime python",
+          "age_days": 1
+        }
+      ],
+      "expected": [
+        "region",
+        "database",
+        "runtime"
+      ],
+      "forbidden": []
+    },
+    {
+      "id": "evaluation-hot_pollution",
+      "split": "evaluation",
+      "category": "hot_pollution",
+      "query": "beacon deployment database configuration",
+      "memories": [
+        {
+          "key": "correct",
+          "content": "beacon deployment database configuration sqlite",
+          "age_days": 30,
+          "access_age_days": 30,
+          "access_count": 1
+        },
+        {
+          "key": "wrong-0",
+          "content": "beacon deployment database configuration mysql obsolete 0",
+          "age_days": 1,
+          "access_age_days": 0,
+          "access_count": 50
+        },
+        {
+          "key": "wrong-1",
+          "content": "beacon deployment database configuration mysql obsolete 1",
+          "age_days": 1,
+          "access_age_days": 0,
+          "access_count": 51
+        },
+        {
+          "key": "wrong-2",
+          "content": "beacon deployment database configuration mysql obsolete 2",
+          "age_days": 1,
+          "access_age_days": 0,
+          "access_count": 52
+        },
+        {
+          "key": "wrong-3",
+          "content": "beacon deployment database configuration mysql obsolete 3",
+          "age_days": 1,
+          "access_age_days": 0,
+          "access_count": 53
+        }
+      ],
+      "expected": [
+        "correct"
+      ],
+      "forbidden": [
+        "wrong-0",
+        "wrong-1",
+        "wrong-2",
+        "wrong-3"
+      ]
+    },
+    {
+      "id": "evaluation-fresh_correction",
+      "split": "evaluation",
+      "category": "fresh_correction",
+      "query": "beacon deployment database configuration",
+      "memories": [
+        {
+          "key": "wrong-0",
+          "content": "beacon deployment database configuration mysql obsolete 0",
+          "age_days": 30,
+          "access_age_days": 20,
+          "access_count": 50
+        },
+        {
+          "key": "wrong-1",
+          "content": "beacon deployment database configuration mysql obsolete 1",
+          "age_days": 30,
+          "access_age_days": 20,
+          "access_count": 51
+        },
+        {
+          "key": "wrong-2",
+          "content": "beacon deployment database configuration mysql obsolete 2",
+          "age_days": 30,
+          "access_age_days": 20,
+          "access_count": 52
+        },
+        {
+          "key": "wrong-3",
+          "content": "beacon deployment database configuration mysql obsolete 3",
+          "age_days": 30,
+          "access_age_days": 20,
+          "access_count": 53
+        },
+        {
+          "key": "correct",
+          "content": "beacon deployment database configuration sqlite",
+          "age_days": 1,
+          "access_age_days": 0,
+          "access_count": 1
+        }
+      ],
+      "expected": [
+        "correct"
+      ],
+      "forbidden": [
+        "wrong-0",
+        "wrong-1",
+        "wrong-2",
+        "wrong-3"
+      ]
+    },
+    {
+      "id": "evaluation-cold_important",
+      "split": "evaluation",
+      "category": "cold_important",
+      "query": "beacon emergency recovery key",
+      "memories": [
+        {
+          "key": "recovery",
+          "content": "beacon emergency recovery key vault",
+          "age_days": 90,
+          "access_age_days": 90,
+          "access_count": 0,
+          "importance": 1.0
+        },
+        {
+          "key": "noise-0",
+          "content": "beacon daily routine meeting 0",
+          "age_days": 1,
+          "access_age_days": 0,
+          "access_count": 10
+        },
+        {
+          "key": "noise-1",
+          "content": "beacon daily routine meeting 1",
+          "age_days": 1,
+          "access_age_days": 0,
+          "access_count": 11
+        },
+        {
+          "key": "noise-2",
+          "content": "beacon daily routine meeting 2",
+          "age_days": 1,
+          "access_age_days": 0,
+          "access_count": 12
+        },
+        {
+          "key": "noise-3",
+          "content": "beacon daily routine meeting 3",
+          "age_days": 1,
+          "access_age_days": 0,
+          "access_count": 13
+        },
+        {
+          "key": "noise-4",
+          "content": "beacon daily routine meeting 4",
+          "age_days": 1,
+          "access_age_days": 0,
+          "access_count": 14
+        },
+        {
+          "key": "noise-5",
+          "content": "beacon daily routine meeting 5",
+          "age_days": 1,
+          "access_age_days": 0,
+          "access_count": 15
+        },
+        {
+          "key": "noise-6",
+          "content": "beacon daily routine meeting 6",
+          "age_days": 1,
+          "access_age_days": 0,
+          "access_count": 16
+        },
+        {
+          "key": "noise-7",
+          "content": "beacon daily routine meeting 7",
+          "age_days": 1,
+          "access_age_days": 0,
+          "access_count": 17
+        },
+        {
+          "key": "noise-8",
+          "content": "beacon daily routine meeting 8",
+          "age_days": 1,
+          "access_age_days": 0,
+          "access_count": 18
+        },
+        {
+          "key": "noise-9",
+          "content": "beacon daily routine meeting 9",
+          "age_days": 1,
+          "access_age_days": 0,
+          "access_count": 19
+        }
+      ],
+      "expected": [
+        "recovery"
+      ],
+      "forbidden": []
+    },
+    {
+      "id": "evaluation-expired_candidates",
+      "split": "evaluation",
+      "category": "expired_candidates",
+      "query": "beacon deployment database configuration mysql",
+      "memories": [
+        {
+          "key": "expired-0",
+          "content": "beacon deployment database configuration mysql 0",
+          "age_days": 30,
+          "expired": true
+        },
+        {
+          "key": "expired-1",
+          "content": "beacon deployment database configuration mysql 1",
+          "age_days": 30,
+          "expired": true
+        },
+        {
+          "key": "expired-2",
+          "content": "beacon deployment database configuration mysql 2",
+          "age_days": 30,
+          "expired": true
+        },
+        {
+          "key": "expired-3",
+          "content": "beacon deployment database configuration mysql 3",
+          "age_days": 30,
+          "expired": true
+        },
+        {
+          "key": "expired-4",
+          "content": "beacon deployment database configuration mysql 4",
+          "age_days": 30,
+          "expired": true
+        },
+        {
+          "key": "expired-5",
+          "content": "beacon deployment database configuration mysql 5",
+          "age_days": 30,
+          "expired": true
+        },
+        {
+          "key": "expired-6",
+          "content": "beacon deployment database configuration mysql 6",
+          "age_days": 30,
+          "expired": true
+        },
+        {
+          "key": "expired-7",
+          "content": "beacon deployment database configuration mysql 7",
+          "age_days": 30,
+          "expired": true
+        },
+        {
+          "key": "expired-8",
+          "content": "beacon deployment database configuration mysql 8",
+          "age_days": 30,
+          "expired": true
+        },
+        {
+          "key": "expired-9",
+          "content": "beacon deployment database configuration mysql 9",
+          "age_days": 30,
+          "expired": true
+        },
+        {
+          "key": "expired-10",
+          "content": "beacon deployment database configuration mysql 10",
+          "age_days": 30,
+          "expired": true
+        },
+        {
+          "key": "expired-11",
+          "content": "beacon deployment database configuration mysql 11",
+          "age_days": 30,
+          "expired": true
+        },
+        {
+          "key": "expired-12",
+          "content": "beacon deployment database configuration mysql 12",
+          "age_days": 30,
+          "expired": true
+        },
+        {
+          "key": "expired-13",
+          "content": "beacon deployment database configuration mysql 13",
+          "age_days": 30,
+          "expired": true
+        },
+        {
+          "key": "expired-14",
+          "content": "beacon deployment database configuration mysql 14",
+          "age_days": 30,
+          "expired": true
+        },
+        {
+          "key": "expired-15",
+          "content": "beacon deployment database configuration mysql 15",
+          "age_days": 30,
+          "expired": true
+        },
+        {
+          "key": "expired-16",
+          "content": "beacon deployment database configuration mysql 16",
+          "age_days": 30,
+          "expired": true
+        },
+        {
+          "key": "expired-17",
+          "content": "beacon deployment database configuration mysql 17",
+          "age_days": 30,
+          "expired": true
+        },
+        {
+          "key": "expired-18",
+          "content": "beacon deployment database configuration mysql 18",
+          "age_days": 30,
+          "expired": true
+        },
+        {
+          "key": "expired-19",
+          "content": "beacon deployment database configuration mysql 19",
+          "age_days": 30,
+          "expired": true
+        },
+        {
+          "key": "expired-20",
+          "content": "beacon deployment database configuration mysql 20",
+          "age_days": 30,
+          "expired": true
+        },
+        {
+          "key": "expired-21",
+          "content": "beacon deployment database configuration mysql 21",
+          "age_days": 30,
+          "expired": true
+        },
+        {
+          "key": "expired-22",
+          "content": "beacon deployment database configuration mysql 22",
+          "age_days": 30,
+          "expired": true
+        },
+        {
+          "key": "expired-23",
+          "content": "beacon deployment database configuration mysql 23",
+          "age_days": 30,
+          "expired": true
+        },
+        {
+          "key": "expired-24",
+          "content": "beacon deployment database configuration mysql 24",
+          "age_days": 30,
+          "expired": true
+        },
+        {
+          "key": "correct",
+          "content": "beacon deployment database configuration sqlite",
+          "age_days": 1
+        }
+      ],
+      "expected": [
+        "correct"
+      ],
+      "forbidden": [
+        "expired-0",
+        "expired-1",
+        "expired-2",
+        "expired-3",
+        "expired-4",
+        "expired-5",
+        "expired-6",
+        "expired-7",
+        "expired-8",
+        "expired-9",
+        "expired-10",
+        "expired-11",
+        "expired-12",
+        "expired-13",
+        "expired-14",
+        "expired-15",
+        "expired-16",
+        "expired-17",
+        "expired-18",
+        "expired-19",
+        "expired-20",
+        "expired-21",
+        "expired-22",
+        "expired-23",
+        "expired-24"
+      ]
+    }
+  ]
+}

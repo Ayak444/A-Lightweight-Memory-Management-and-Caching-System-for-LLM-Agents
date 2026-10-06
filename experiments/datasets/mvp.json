@@ -1,5 +1,5 @@
 {
-  "version": "1.0.0",
+  "version": "2.0.0",
   "sequences": [
     {
       "sequence_id": "preference-001",
@@ -11,6 +11,42 @@
       ],
       "queries": [
         {"id": "q1", "input": "我偏好使用哪一種中文？", "expected_memory_keys": ["language"], "expected_answer_contains": ["繁體中文"]}
+      ]
+    },
+    {
+      "sequence_id": "preference-002",
+      "category": "preference",
+      "description": "取回程式碼風格偏好",
+      "memories": [
+        {"key": "style", "type": "semantic", "content": "程式碼註解只寫在不容易理解的地方"},
+        {"key": "tests", "type": "semantic", "content": "每個核心 policy 都需要離線測試"}
+      ],
+      "queries": [
+        {"id": "q1", "input": "這個專案的註解原則是什麼？", "expected_memory_keys": ["style"], "expected_answer_contains": ["不容易理解"]}
+      ]
+    },
+    {
+      "sequence_id": "preference-003",
+      "category": "preference",
+      "description": "取回回答格式偏好",
+      "memories": [
+        {"key": "bullet", "type": "semantic", "content": "回答時偏好使用條列式 bullet points"},
+        {"key": "code_lang", "type": "semantic", "content": "程式碼範例預設使用 Python"}
+      ],
+      "queries": [
+        {"id": "q1", "input": "回答時應該使用什麼格式？", "expected_memory_keys": ["bullet"], "expected_answer_contains": ["條列式", "bullet"]}
+      ]
+    },
+    {
+      "sequence_id": "preference-004",
+      "category": "preference",
+      "description": "取回 naming convention 偏好",
+      "memories": [
+        {"key": "naming", "type": "semantic", "content": "Python 變數使用 snake_case，類別使用 PascalCase"},
+        {"key": "docstring", "type": "semantic", "content": "Docstring 使用 Google style format"}
+      ],
+      "queries": [
+        {"id": "q1", "input": "Python 的命名規則是什麼？", "expected_memory_keys": ["naming"], "expected_answer_contains": ["snake_case"]}
       ]
     },
     {
@@ -26,6 +62,42 @@
       ]
     },
     {
+      "sequence_id": "repetition-002",
+      "category": "repetition",
+      "description": "英文查詢的詞彙改寫基準",
+      "memories": [
+        {"key": "cache_ttl", "type": "semantic", "content": "Semantic cache entries expire using a configurable TTL"},
+        {"key": "cache_metric", "type": "semantic", "content": "Cache hit rate is recorded for every benchmark run"}
+      ],
+      "queries": [
+        {"id": "q1", "input": "How do cached responses expire?", "expected_memory_keys": ["cache_ttl"], "expected_answer_contains": ["TTL"]}
+      ]
+    },
+    {
+      "sequence_id": "repetition-003",
+      "category": "repetition",
+      "description": "中文同義改寫 — 向量資料庫",
+      "memories": [
+        {"key": "vector_db", "type": "semantic", "content": "本地向量搜尋使用 SQLite-based exact search"},
+        {"key": "embedding", "type": "semantic", "content": "離線測試使用 DeterministicHashEmbedding"}
+      ],
+      "queries": [
+        {"id": "q1", "input": "向量資料的搜尋方式是什麼？", "expected_memory_keys": ["vector_db"], "expected_answer_contains": ["SQLite"]}
+      ]
+    },
+    {
+      "sequence_id": "repetition-004",
+      "category": "repetition",
+      "description": "英文換字改寫 — eviction",
+      "memories": [
+        {"key": "eviction_ttl", "type": "semantic", "content": "Expired memories are removed using TTL eviction policy"},
+        {"key": "eviction_lru", "type": "semantic", "content": "LRU eviction removes least recently accessed memories"}
+      ],
+      "queries": [
+        {"id": "q1", "input": "How are outdated memories cleaned up?", "expected_memory_keys": ["eviction_ttl"], "expected_answer_contains": ["TTL"]}
+      ]
+    },
+    {
       "sequence_id": "update-001",
       "category": "update",
       "description": "新部署地點取代舊地點",
@@ -35,6 +107,42 @@
       ],
       "queries": [
         {"id": "q1", "input": "目前要部署在哪個區域？", "expected_memory_keys": ["new_region"], "forbidden_memory_keys": ["old_region"], "expected_answer_contains": ["新加坡"]}
+      ]
+    },
+    {
+      "sequence_id": "update-002",
+      "category": "update",
+      "description": "資料庫版本更新",
+      "memories": [
+        {"key": "old_python", "type": "semantic", "content": "專案使用 Python 3.10", "status": "superseded"},
+        {"key": "new_python", "type": "semantic", "content": "專案已升級到 Python 3.12", "supersedes": "old_python"}
+      ],
+      "queries": [
+        {"id": "q1", "input": "目前使用哪個版本的 Python？", "expected_memory_keys": ["new_python"], "forbidden_memory_keys": ["old_python"], "expected_answer_contains": ["3.12"]}
+      ]
+    },
+    {
+      "sequence_id": "update-003",
+      "category": "update",
+      "description": "框架選擇改變",
+      "memories": [
+        {"key": "old_framework", "type": "semantic", "content": "API 框架使用 Flask", "status": "superseded"},
+        {"key": "new_framework", "type": "semantic", "content": "API 框架已改用 FastAPI", "supersedes": "old_framework"}
+      ],
+      "queries": [
+        {"id": "q1", "input": "目前用哪個 API 框架？", "expected_memory_keys": ["new_framework"], "forbidden_memory_keys": ["old_framework"], "expected_answer_contains": ["FastAPI"]}
+      ]
+    },
+    {
+      "sequence_id": "update-004",
+      "category": "update",
+      "description": "Token budget 修改",
+      "memories": [
+        {"key": "old_budget", "type": "semantic", "content": "Token budget 上限設為 1000 tokens", "status": "superseded"},
+        {"key": "new_budget", "type": "semantic", "content": "Token budget 上限已調降為 500 tokens", "supersedes": "old_budget"}
+      ],
+      "queries": [
+        {"id": "q1", "input": "目前的 token budget 上限是多少？", "expected_memory_keys": ["new_budget"], "forbidden_memory_keys": ["old_budget"], "expected_answer_contains": ["500"]}
       ]
     },
     {
@@ -51,6 +159,47 @@
       ]
     },
     {
+      "sequence_id": "long-horizon-002",
+      "category": "long_horizon",
+      "description": "取回較早定義的非目標",
+      "memories": [
+        {"key": "non_goal", "type": "semantic", "content": "MVP 不實作 Graph Memory 或多 Agent orchestration"},
+        {"key": "mvp", "type": "semantic", "content": "MVP 包含 memory lifecycle、semantic cache 與 evaluation"},
+        {"key": "api", "type": "episodic", "content": "API 預計使用 FastAPI"}
+      ],
+      "queries": [
+        {"id": "q1", "input": "第一版刻意不做哪些複雜功能？", "expected_memory_keys": ["non_goal"], "expected_answer_contains": ["Graph Memory", "多 Agent"]}
+      ]
+    },
+    {
+      "sequence_id": "long-horizon-003",
+      "category": "long_horizon",
+      "description": "取回早期的研究問題定義",
+      "memories": [
+        {"key": "rq1", "type": "semantic", "content": "RQ1: Hierarchical memory 能否在維持 task success rate 的情況下降低 token usage"},
+        {"key": "rq2", "type": "semantic", "content": "RQ2: Semantic cache 能降低多少 latency 與 estimated API cost"},
+        {"key": "rq3", "type": "semantic", "content": "RQ3: LRU LFU TTL 與 hybrid eviction 對 retrieval precision 和 memory pollution 有何影響"},
+        {"key": "rq4", "type": "semantic", "content": "RQ4: Context compression ratio 與回答品質之間的轉折點在哪裡"}
+      ],
+      "queries": [
+        {"id": "q1", "input": "Semantic cache 相關的研究問題是什麼？", "expected_memory_keys": ["rq2"], "expected_answer_contains": ["latency", "cost"]}
+      ]
+    },
+    {
+      "sequence_id": "long-horizon-004",
+      "category": "long_horizon",
+      "description": "取回多步驟推理鏈中的中間產物",
+      "memories": [
+        {"key": "step1", "type": "episodic", "content": "第一步：建立了 SQLite schema 與 migration"},
+        {"key": "step2", "type": "episodic", "content": "第二步：完成了 Working Episodic Semantic Memory CRUD"},
+        {"key": "step3", "type": "episodic", "content": "第三步：串接 vector store 完成帶 trace 的 top-k retrieval"},
+        {"key": "step4", "type": "episodic", "content": "第四步：實作 token-budget selection 與 semantic cache"}
+      ],
+      "queries": [
+        {"id": "q1", "input": "vector store 是在第幾步完成的？", "expected_memory_keys": ["step3"], "expected_answer_contains": ["第三步"]}
+      ]
+    },
+    {
       "sequence_id": "conflict-001",
       "category": "conflict",
       "description": "低信心的衝突記憶不應勝過已確認決策",
@@ -60,6 +209,42 @@
       ],
       "queries": [
         {"id": "q1", "input": "Metadata 要保存在哪個資料庫？", "expected_memory_keys": ["confirmed_db"], "forbidden_memory_keys": ["polluted_db"], "expected_answer_contains": ["SQLite"]}
+      ]
+    },
+    {
+      "sequence_id": "conflict-002",
+      "category": "conflict",
+      "description": "錯誤的授權資訊不應被採用",
+      "memories": [
+        {"key": "correct_license", "type": "semantic", "content": "專案使用 MIT 授權", "confidence": 1.0, "importance": 0.9},
+        {"key": "wrong_license", "type": "semantic", "content": "專案使用 GPL-3.0 授權", "confidence": 0.1, "pollution_penalty": 0.6}
+      ],
+      "queries": [
+        {"id": "q1", "input": "這個專案的授權是什麼？", "expected_memory_keys": ["correct_license"], "forbidden_memory_keys": ["wrong_license"], "expected_answer_contains": ["MIT"]}
+      ]
+    },
+    {
+      "sequence_id": "conflict-003",
+      "category": "conflict",
+      "description": "互相矛盾的部署環境",
+      "memories": [
+        {"key": "cloud_deploy", "type": "semantic", "content": "部署環境使用 Zeabur Docker", "confidence": 0.9, "importance": 0.8},
+        {"key": "wrong_deploy", "type": "semantic", "content": "部署環境使用 AWS Lambda serverless", "confidence": 0.15, "pollution_penalty": 0.4}
+      ],
+      "queries": [
+        {"id": "q1", "input": "專案部署在什麼平台？", "expected_memory_keys": ["cloud_deploy"], "forbidden_memory_keys": ["wrong_deploy"], "expected_answer_contains": ["Zeabur"]}
+      ]
+    },
+    {
+      "sequence_id": "conflict-004",
+      "category": "conflict",
+      "description": "互相矛盾的 embedding dimension",
+      "memories": [
+        {"key": "real_dim", "type": "semantic", "content": "Embedding dimension is 64 for the deterministic hash provider", "confidence": 1.0},
+        {"key": "fake_dim", "type": "semantic", "content": "Embedding dimension is 1536 for the default provider", "confidence": 0.3, "pollution_penalty": 0.35}
+      ],
+      "queries": [
+        {"id": "q1", "input": "What is the embedding dimension for the deterministic hash?", "expected_memory_keys": ["real_dim"], "forbidden_memory_keys": ["fake_dim"], "expected_answer_contains": ["64"]}
       ]
     },
     {
@@ -77,6 +262,50 @@
       ]
     },
     {
+      "sequence_id": "irrelevant-002",
+      "category": "irrelevant",
+      "description": "大量無關記憶中找到 eviction 策略",
+      "memories": [
+        {"key": "eviction_policy", "type": "semantic", "content": "Eviction 第一版支援 TTL 與 LRU 淘汰策略"},
+        {"key": "lunch", "type": "working", "content": "午餐吃了日式咖哩"},
+        {"key": "weather", "type": "working", "content": "今天氣溫 28 度"},
+        {"key": "git_status", "type": "episodic", "content": "已推送 feat/eviction 分支到 remote"},
+        {"key": "coffee", "type": "working", "content": "下午三點喝了拿鐵"}
+      ],
+      "queries": [
+        {"id": "q1", "input": "記憶淘汰支援哪些策略？", "expected_memory_keys": ["eviction_policy"], "expected_answer_contains": ["TTL", "LRU"]}
+      ]
+    },
+    {
+      "sequence_id": "irrelevant-003",
+      "category": "irrelevant",
+      "description": "英文無關記憶中的信號",
+      "memories": [
+        {"key": "retrieval_weights", "type": "semantic", "content": "Retrieval hybrid score uses 55% similarity 15% recency 15% importance 10% confidence 5% frequency"},
+        {"key": "random1", "type": "working", "content": "Ordered new keyboard from Amazon"},
+        {"key": "random2", "type": "episodic", "content": "Fixed a typo in the README header"},
+        {"key": "random3", "type": "working", "content": "Updated VS Code to the latest version"}
+      ],
+      "queries": [
+        {"id": "q1", "input": "What weights does the hybrid retrieval scoring use?", "expected_memory_keys": ["retrieval_weights"], "expected_answer_contains": ["55%", "similarity"]}
+      ]
+    },
+    {
+      "sequence_id": "irrelevant-004",
+      "category": "irrelevant",
+      "description": "在雜訊中找到 cache scope 設計",
+      "memories": [
+        {"key": "scope_design", "type": "semantic", "content": "Cache scope fingerprint 包含 system_prompt model_id tool_schema 與 context hash"},
+        {"key": "noise1", "type": "working", "content": "今天的 stand-up 討論了 sprint backlog"},
+        {"key": "noise2", "type": "episodic", "content": "重新安裝了 Python 3.12"},
+        {"key": "noise3", "type": "working", "content": "調整了螢幕亮度"},
+        {"key": "noise4", "type": "episodic", "content": "寫了一封 email 給 mentor"}
+      ],
+      "queries": [
+        {"id": "q1", "input": "Cache scope fingerprint 由哪些元素組成？", "expected_memory_keys": ["scope_design"], "expected_answer_contains": ["system_prompt", "model_id"]}
+      ]
+    },
+    {
       "sequence_id": "scope-001",
       "category": "scope_isolation",
       "description": "不同專案 scope 不可互相取回資料",
@@ -89,42 +318,78 @@
       ]
     },
     {
-      "sequence_id": "repetition-002",
-      "category": "repetition",
-      "description": "英文查詢的詞彙改寫基準",
+      "sequence_id": "scope-002",
+      "category": "scope_isolation",
+      "description": "使用者 scope 隔離",
       "memories": [
-        {"key": "cache_ttl", "type": "semantic", "content": "Semantic cache entries expire using a configurable TTL"},
-        {"key": "cache_metric", "type": "semantic", "content": "Cache hit rate is recorded for every benchmark run"}
+        {"key": "user_a_pref", "scope": "user-alice", "type": "semantic", "content": "Alice 偏好英文回答"},
+        {"key": "user_b_pref", "scope": "user-bob", "type": "semantic", "content": "Bob 偏好中文回答"}
       ],
       "queries": [
-        {"id": "q1", "input": "How do cached responses expire?", "expected_memory_keys": ["cache_ttl"], "expected_answer_contains": ["TTL"]}
+        {"id": "q1", "scope": "user-bob", "input": "這個使用者偏好什麼語言？", "expected_memory_keys": ["user_b_pref"], "forbidden_memory_keys": ["user_a_pref"], "expected_answer_contains": ["中文"]}
       ]
     },
     {
-      "sequence_id": "preference-002",
-      "category": "preference",
-      "description": "取回程式碼風格偏好",
+      "sequence_id": "scope-003",
+      "category": "scope_isolation",
+      "description": "不同 session 的 working memory 隔離",
       "memories": [
-        {"key": "style", "type": "semantic", "content": "程式碼註解只寫在不容易理解的地方"},
-        {"key": "tests", "type": "semantic", "content": "每個核心 policy 都需要離線測試"}
+        {"key": "session_1", "scope": "session-morning", "type": "working", "content": "目前正在討論資料庫 migration"},
+        {"key": "session_2", "scope": "session-afternoon", "type": "working", "content": "目前正在討論 API 設計"}
       ],
       "queries": [
-        {"id": "q1", "input": "這個專案的註解原則是什麼？", "expected_memory_keys": ["style"], "expected_answer_contains": ["不容易理解"]}
+        {"id": "q1", "scope": "session-afternoon", "input": "我們目前在討論什麼主題？", "expected_memory_keys": ["session_2"], "forbidden_memory_keys": ["session_1"], "expected_answer_contains": ["API"]}
       ]
     },
     {
-      "sequence_id": "long-horizon-002",
+      "sequence_id": "scope-004",
+      "category": "scope_isolation",
+      "description": "跨 team scope 的機密隔離",
+      "memories": [
+        {"key": "team_a_secret", "scope": "team-backend", "type": "semantic", "content": "Backend 的 API key 是由 HashiCorp Vault 管理"},
+        {"key": "team_b_secret", "scope": "team-frontend", "type": "semantic", "content": "Frontend 的部署 token 存在 GitHub Actions secrets"}
+      ],
+      "queries": [
+        {"id": "q1", "scope": "team-backend", "input": "API key 是如何管理的？", "expected_memory_keys": ["team_a_secret"], "forbidden_memory_keys": ["team_b_secret"], "expected_answer_contains": ["Vault"]}
+      ]
+    },
+    {
+      "sequence_id": "update-005",
+      "category": "update",
+      "description": "Cache TTL 設定更新",
+      "memories": [
+        {"key": "old_ttl", "type": "semantic", "content": "Cache 預設 TTL 為 3600 秒（一小時）", "status": "superseded"},
+        {"key": "new_ttl", "type": "semantic", "content": "Cache 預設 TTL 已改為 1800 秒（半小時）", "supersedes": "old_ttl"}
+      ],
+      "queries": [
+        {"id": "q1", "input": "Cache 的預設 TTL 是多少？", "expected_memory_keys": ["new_ttl"], "forbidden_memory_keys": ["old_ttl"], "expected_answer_contains": ["1800"]}
+      ]
+    },
+    {
+      "sequence_id": "long-horizon-005",
       "category": "long_horizon",
-      "description": "取回較早定義的非目標",
+      "description": "取回 ADR 決策記錄",
       "memories": [
-        {"key": "non_goal", "type": "semantic", "content": "MVP 不實作 Graph Memory 或多 Agent orchestration"},
-        {"key": "mvp", "type": "semantic", "content": "MVP 包含 memory lifecycle、semantic cache 與 evaluation"},
-        {"key": "api", "type": "episodic", "content": "API 預計使用 FastAPI"}
+        {"key": "adr1", "type": "episodic", "content": "ADR-0001 決定使用 SQLite 作為 source of truth"},
+        {"key": "adr2", "type": "episodic", "content": "ADR-0002 決定核心邏輯不直接 import LLM SDK"},
+        {"key": "adr3", "type": "episodic", "content": "ADR-0003 決定 metadata 與 vector index 分開儲存"},
+        {"key": "adr4", "type": "episodic", "content": "ADR-0004 決定 cache scope 使用 fingerprint 避免跨配置命中"}
       ],
       "queries": [
-        {"id": "q1", "input": "第一版刻意不做哪些複雜功能？", "expected_memory_keys": ["non_goal"], "expected_answer_contains": ["Graph Memory", "多 Agent"]}
+        {"id": "q1", "input": "為什麼 metadata 和 vector 要分開存放？", "expected_memory_keys": ["adr3"], "expected_answer_contains": ["分開"]}
+      ]
+    },
+    {
+      "sequence_id": "repetition-005",
+      "category": "repetition",
+      "description": "中文同義改寫 — 記憶去重",
+      "memories": [
+        {"key": "dedup", "type": "semantic", "content": "記憶去重使用 content_hash 在同 scope type active 條件下判斷"},
+        {"key": "version", "type": "semantic", "content": "記憶版本使用 optimistic update 的 version 欄位"}
+      ],
+      "queries": [
+        {"id": "q1", "input": "系統如何避免重複儲存相同內容？", "expected_memory_keys": ["dedup"], "expected_answer_contains": ["content_hash"]}
       ]
     }
   ]
 }
-

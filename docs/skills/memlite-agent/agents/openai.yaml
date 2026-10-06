@@ -1,0 +1,6 @@
+interface:
+  display_name: "MemLite 記憶與研究助手"
+  short_description: "管理具 scope 的本地記憶，接續 MemLite 研究、執行可重現實驗並記錄真實結果"
+  default_prompt: "使用 $memlite-agent 管理本地記憶，或讀取 PROGRESS.md 接續 MemLite-Agent 研究，完成測試並更新研究紀錄。"
+policy:
+  allow_implicit_invocation: true

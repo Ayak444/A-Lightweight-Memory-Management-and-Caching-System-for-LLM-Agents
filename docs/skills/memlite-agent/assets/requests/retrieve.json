@@ -1,0 +1,6 @@
+{
+  "operation": "retrieve",
+  "scope": "project:memlite-demo",
+  "query": "SQLite 儲存記憶",
+  "types": ["semantic"]
+}

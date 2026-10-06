@@ -35,6 +35,12 @@ class VectorIndex(Protocol):
         model_id: str,
         memory_types: set[MemoryType] | None = None,
         limit: int = 20,
-    ) -> list[VectorSearchHit]: ...
+    ) -> list[VectorSearchHit]:
+        """Return up to limit hits ranked by similarity, with deterministic ties.
+
+        Increasing limit on an unchanged index must preserve the previous prefix;
+        retrieval uses this to refill after authoritative metadata filtering.
+        """
+        ...
 
     def close(self) -> None: ...

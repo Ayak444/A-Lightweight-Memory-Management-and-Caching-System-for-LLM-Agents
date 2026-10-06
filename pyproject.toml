@@ -12,13 +12,19 @@ license = { text = "MIT" }
 authors = [
   { name = "陳格洋" }
 ]
-dependencies = []
+dependencies = [
+  "openai>=1.12",
+  "tiktoken>=0.6",
+  "fastapi>=0.110",
+  "uvicorn[standard]>=0.27"
+]
 
 [project.optional-dependencies]
 dev = [
   "mypy>=1.11",
   "pytest>=8.0",
-  "ruff>=0.6"
+  "ruff>=0.6",
+  "httpx>=0.27"
 ]
 
 [project.scripts]
@@ -33,6 +39,7 @@ testpaths = ["tests"]
 [tool.ruff]
 line-length = 100
 target-version = "py311"
+extend-exclude = ["experiments/results", "dist", "build"]
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "UP", "B"]

@@ -1,5 +1,7 @@
 # MemLite-Agent 逐檔架構導讀
 
+> 此文件是 2026-09-14 的架構快照。2026-10-03 已加入 cache、eviction、Agent、API 與實驗整合，最新狀態請見 [PROGRESS.md](../PROGRESS.md) 與 [研究驗證紀錄](RESEARCH_UPDATE_20261003.zh-TW.md)。
+
 核對日期：2026-09-14。對象：專題指導教授與口試委員。依目前原始碼說明；規劃文件不代表功能已完成。
 
 ## 1. 專題定位

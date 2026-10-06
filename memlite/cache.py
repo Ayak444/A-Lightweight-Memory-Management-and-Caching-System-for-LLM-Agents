@@ -8,6 +8,7 @@ so that identical queries under different configurations are isolated.
 from __future__ import annotations
 
 import json
+import math
 import sqlite3
 from dataclasses import dataclass, field
 from datetime import datetime, timedelta
@@ -277,8 +278,6 @@ class SemanticCache:
 
         # 2. Semantic similarity
         query_vector = self._embedding.embed([query])[0]
-        from memlite.models import MemoryType  # avoid circular at module level
-
         hits = self._vector_index.search(
             query_vector,
             scope_id=f"cache:{scope_id}",
@@ -286,24 +285,26 @@ class SemanticCache:
             limit=5,
         )
 
+        rejected: CacheLookupResult | None = None
         for hit in hits:
-            if hit.similarity < self._threshold:
+            if not math.isfinite(hit.similarity) or hit.similarity < self._threshold:
                 continue
             entry = self._get(hit.memory_id)
             if entry is None or entry.status is not CacheStatus.ACTIVE:
                 continue
             if entry.is_expired(now):
                 continue
+            if entry.scope_id != scope_id:
+                continue
             if entry.scope_fingerprint != fp:
                 # Same query, different context — reject
-                result = CacheLookupResult(
+                rejected = CacheLookupResult(
                     event_type=CacheEventType.REJECTED_HIT,
                     entry=entry,
                     similarity=hit.similarity,
                     rejection_reason="scope_fingerprint_mismatch",
                 )
-                self._log_event(result, scope_id, qhash, now)
-                return result
+                continue
 
             self._touch(entry.id, now)
             entry.similarity = hit.similarity
@@ -314,6 +315,10 @@ class SemanticCache:
             )
             self._log_event(result, scope_id, qhash, now)
             return result
+
+        if rejected is not None:
+            self._log_event(rejected, scope_id, qhash, now)
+            return rejected
 
         # 3. Cache miss
         result = CacheLookupResult(
@@ -337,6 +342,8 @@ class SemanticCache:
         """Store a query-response pair in cache."""
         now = utc_now()
         effective_ttl = ttl_seconds if ttl_seconds is not None else self._default_ttl
+        if effective_ttl is not None and effective_ttl <= 0:
+            raise ValueError("ttl_seconds must be positive")
 
         entry = CacheEntry(
             query=query,
@@ -402,7 +409,12 @@ class SemanticCache:
                 UPDATE cache_entries SET status = ?, last_accessed_at = ?
                 WHERE id = ? AND status = ?
                 """,
-                (CacheStatus.INVALIDATED.value, now.isoformat(), cache_id, CacheStatus.ACTIVE.value),
+                (
+                    CacheStatus.INVALIDATED.value,
+                    now.isoformat(),
+                    cache_id,
+                    CacheStatus.ACTIVE.value,
+                ),
             )
         if cursor.rowcount == 1:
             self._vector_index.delete(cache_id)
@@ -417,7 +429,6 @@ class SemanticCache:
 
     def invalidate_scope(self, scope_id: str) -> int:
         """Invalidate all active cache entries for a scope."""
-        now = utc_now()
         rows = self._conn.execute(
             "SELECT id FROM cache_entries WHERE scope_id = ? AND status = ?",
             (scope_id, CacheStatus.ACTIVE.value),
@@ -494,9 +505,7 @@ class SemanticCache:
         return entry
 
     def _get(self, cache_id: str) -> CacheEntry | None:
-        row = self._conn.execute(
-            "SELECT * FROM cache_entries WHERE id = ?", (cache_id,)
-        ).fetchone()
+        row = self._conn.execute("SELECT * FROM cache_entries WHERE id = ?", (cache_id,)).fetchone()
         return self._entry_from_row(row) if row else None
 
     def _touch(self, cache_id: str, now: datetime) -> None:
@@ -551,13 +560,9 @@ class SemanticCache:
             scope_fingerprint=row["scope_fingerprint"],
             model_id=row["model_id"],
             created_at=datetime.fromisoformat(row["created_at"]),
-            expires_at=(
-                datetime.fromisoformat(row["expires_at"]) if row["expires_at"] else None
-            ),
+            expires_at=(datetime.fromisoformat(row["expires_at"]) if row["expires_at"] else None),
             last_accessed_at=(
-                datetime.fromisoformat(row["last_accessed_at"])
-                if row["last_accessed_at"]
-                else None
+                datetime.fromisoformat(row["last_accessed_at"]) if row["last_accessed_at"] else None
             ),
             access_count=row["access_count"],
             status=CacheStatus(row["status"]),

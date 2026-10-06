@@ -291,8 +291,10 @@ experiments/
 class LLMProvider(Protocol):
     async def complete(self, request: CompletionRequest) -> CompletionResult: ...
 
+
 class EmbeddingProvider(Protocol):
     async def embed(self, texts: list[str]) -> list[list[float]]: ...
+
 
 class TokenCounter(Protocol):
     def count(self, text: str, model: str | None = None) -> int: ...

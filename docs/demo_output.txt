@@ -1,0 +1,50 @@
+============================================================
+ MemLite-Agent  End-to-End Demo
+ Data directory: <isolated temporary database; removed after demo>
+============================================================
+
+─── Step 1: 記住授權限制 ───
+  User: 記住：專案只能使用 MIT 或 Apache-2.0 授權套件。
+  Agent: [fake-response] Acknowledged: 記住：專案只能使用 MIT 或 Apache-2.0 授權套件。
+  [tokens: in=40, out=23]
+  [active memories in scope: 1]
+  [cache: total=0, hits=0, misses=0]
+
+─── Step 2: 比較向量資料庫 ───
+  User: 根據以下假設比較方案：Chroma（MIT、本地）、Qdrant（Apache-2.0、伺服器）、Milvus（Apache-2.0、Docker）。
+  Agent: [fake-response] Acknowledged: 根據以下假設比較方案：Chroma（MIT、本地）、Qdrant（Apache-2.0、伺服器）、Milvus（Apache-2.0、Docker）。
+  [tokens: in=104, out=41]
+  [active memories in scope: 1]
+  [cache: total=1, hits=0, misses=1]
+
+─── Step 3: 推薦方案（應參考授權限制記憶） ───
+  User: 延續前面的授權限制，請推薦其中一個向量資料庫方案。
+  Agent: [fake-response] Acknowledged: 延續前面的授權限制，請推薦其中一個向量資料庫方案。
+  [tokens: in=90, out=27]
+  [active memories in scope: 1]
+  [cache: total=2, hits=0, misses=2]
+
+─── Step 4: 更新部署限制 ───
+  User: 記住：部署環境不允許常駐外部資料庫。請更新這個限制。
+  Agent: [fake-response] Acknowledged: 記住：部署環境不允許常駐外部資料庫。請更新這個限制。
+  [tokens: in=91, out=27]
+  [active memories in scope: 2]
+  [cache: total=2, hits=0, misses=2]
+
+─── Step 5: 重新推薦（應使用更新後的限制） ───
+  User: 根據目前所有限制，再次推薦向量資料庫方案。
+  Agent: [fake-response] Acknowledged: 根據目前所有限制，再次推薦向量資料庫方案。
+  [tokens: in=91, out=24]
+  [active memories in scope: 2]
+  [cache: total=3, hits=0, misses=3]
+
+─── Step 6: 語義改寫的問題（測試 semantic cache） ───
+  User: 哪些套件的開源授權是可以使用的？
+  Agent: [fake-response] Acknowledged: 哪些套件的開源授權是可以使用的？
+  [tokens: in=83, out=20]
+  [active memories in scope: 2]
+  [cache: total=4, hits=0, misses=4]
+
+============================================================
+ Demo completed.
+============================================================

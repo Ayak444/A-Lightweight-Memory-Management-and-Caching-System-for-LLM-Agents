@@ -25,9 +25,7 @@ class FakeLLMProviderTestCase(unittest.TestCase):
 
     def test_same_input_gives_same_output(self) -> None:
         provider = FakeLLMProvider()
-        request = CompletionRequest(
-            messages=[{"role": "user", "content": "Hello"}]
-        )
+        request = CompletionRequest(messages=[{"role": "user", "content": "Hello"}])
         r1 = provider.complete(request)
         r2 = provider.complete(request)
         self.assertEqual(r1.content, r2.content)

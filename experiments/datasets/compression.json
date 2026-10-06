@@ -1,0 +1,42 @@
+{
+  "version": "compression-1.0.0",
+  "provenance": "Six authored offline fact-retention stress cases, not independent held-out tasks or LLM answer-quality labels.",
+  "cases": [
+    {
+      "id": "short_fact",
+      "query": "SQLite database",
+      "content": "Database is SQLite.",
+      "required": ["Database is SQLite."]
+    },
+    {
+      "id": "three_required",
+      "query": "Deployment region database runtime",
+      "content": "Deployment region is Tokyo. Deployment database is SQLite. Deployment runtime is Python. Daily lunch is at noon. Weekly meeting is on Wednesday.",
+      "required": ["region is Tokyo", "database is SQLite", "runtime is Python"]
+    },
+    {
+      "id": "negation",
+      "query": "Deployment databases",
+      "content": "Deployment does not permit external databases. Deployment uses a local SQLite database. Daily meetings are optional. Weekly lunch is at noon.",
+      "required": ["does not permit external databases", "local SQLite database"]
+    },
+    {
+      "id": "numbers_units",
+      "query": "Recovery objective retention",
+      "content": "Recovery objective is 15 minutes. Recovery retention is 30 days. Daily lunch is at noon. Weekly meeting is on Wednesday.",
+      "required": ["objective is 15 minutes", "retention is 30 days"]
+    },
+    {
+      "id": "chinese_query",
+      "query": "資料庫與執行環境",
+      "content": "部署區域是東京。資料庫是 SQLite。執行環境是 Python。會議改到星期三。",
+      "required": ["資料庫是 SQLite。", "執行環境是 Python。"]
+    },
+    {
+      "id": "long_required_sentence",
+      "query": "SQLite database recovery",
+      "content": "SQLite database recovery requires retaining the approved archive, verifying the checksum, checking the owner, reviewing the incident, documenting the evidence, confirming the deployment environment, inspecting the schema migration, validating the backup configuration, checking the retention policy, and obtaining the operator approval before restoring the vault key. Daily meeting is optional.",
+      "required": ["obtaining the operator approval before restoring the vault key"]
+    }
+  ]
+}

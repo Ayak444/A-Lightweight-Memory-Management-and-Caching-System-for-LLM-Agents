@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from memlite.cache import CacheLookupResult, CacheEntry, CacheStats, SemanticCache, ScopeContext
+from memlite.cache import CacheEntry, CacheLookupResult, CacheStats, ScopeContext, SemanticCache
 from memlite.embeddings.base import EmbeddingProvider
 from memlite.embeddings.deterministic import DeterministicHashEmbedding
 from memlite.manager import MemoryManager
@@ -10,10 +10,6 @@ from memlite.models import MemoryItem, MemoryType, SourceType
 from memlite.policies.eviction import (
     EvictionPolicy,
     EvictionResult,
-    HybridEviction,
-    LFUEviction,
-    LRUEviction,
-    TTLEviction,
 )
 from memlite.policies.retrieval import RetrievalConfig, RetrievalResponse, RetrievalService
 from memlite.storage.sqlite import SQLiteMemoryStore
@@ -63,6 +59,17 @@ class MemLiteEngine:
 
     # -- Memory operations --
 
+    def get_memory(self, memory_id: str, *, scope_id: str) -> MemoryItem | None:
+        """Inspect a source record only within the caller's explicit scope."""
+        item = self._store.get(memory_id)
+        return item if item is not None and item.scope_id == scope_id else None
+
+    def list_memories(self, *, scope_id: str, limit: int = 20) -> list[MemoryItem]:
+        """Inspect active memories without changing access frequency."""
+        if not scope_id.strip() or not 1 <= limit <= 1000:
+            raise ValueError("scope must be nonempty and limit must be between 1 and 1000")
+        return self._store.list_active(scope_id=scope_id, limit=limit)
+
     def remember(
         self,
         *,
@@ -87,6 +94,7 @@ class MemLiteEngine:
             ttl_seconds=ttl_seconds,
             metadata=metadata,
         )
+        self._cache.invalidate_scope(item.scope_id)
         self._index(item)
         return item
 
@@ -103,15 +111,28 @@ class MemLiteEngine:
             memory_types=memory_types,
         )
 
-    def supersede(self, memory_id: str, *, content: str) -> MemoryItem:
-        replacement = self._manager.supersede(memory_id, content=content)
+    def supersede(
+        self,
+        memory_id: str,
+        *,
+        content: str,
+        source_type: SourceType = SourceType.USER,
+        source_ref: str | None = None,
+    ) -> MemoryItem:
+        replacement = self._manager.supersede(
+            memory_id, content=content, source_type=source_type, source_ref=source_ref
+        )
+        self._cache.invalidate_scope(replacement.scope_id)
         self._vector_index.delete(memory_id)
         self._index(replacement)
         return replacement
 
     def forget(self, memory_id: str) -> bool:
+        item = self._store.get(memory_id)
         deleted = self._manager.forget(memory_id)
         if deleted:
+            if item is not None:
+                self._cache.invalidate_scope(item.scope_id)
             self._vector_index.delete(memory_id)
         return deleted
 
@@ -187,9 +208,9 @@ class MemLiteEngine:
         if active_policy is None:
             raise ValueError("no eviction policy configured; pass one or set it in the constructor")
 
-        result = active_policy.evict(
-            self._store, scope_id=scope_id, memory_types=memory_types
-        )
+        result = active_policy.evict(self._store, scope_id=scope_id, memory_types=memory_types)
+        if result.evicted_ids:
+            self._cache.invalidate_scope(scope_id)
         for evicted_id in result.evicted_ids:
             self._vector_index.delete(evicted_id)
         return result

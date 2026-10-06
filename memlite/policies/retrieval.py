@@ -27,10 +27,16 @@ class RetrievalConfig:
     confidence_weight: float = 0.10
     frequency_weight: float = 0.05
     recency_half_life_days: float = 30.0
+    candidate_scan_limit: int | None = None
 
     def __post_init__(self) -> None:
         if self.candidate_limit < 1:
             raise ValueError("candidate_limit must be at least one")
+        if self.candidate_scan_limit is not None and (
+            type(self.candidate_scan_limit) is not int
+            or self.candidate_scan_limit < self.candidate_limit
+        ):
+            raise ValueError("candidate_scan_limit must be an integer >= candidate_limit")
         if self.max_results < 1:
             raise ValueError("max_results must be at least one")
         if self.token_budget < 1:
@@ -99,6 +105,10 @@ class RetrievalResponse:
     candidates: list[RetrievalCandidate]
     selected_memory_ids: list[str]
     selected_tokens: int
+    search_rounds: int = 0
+    scanned_hits: int = 0
+    search_limit: int = 0
+    scan_limit_reached: bool = False
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -107,6 +117,10 @@ class RetrievalResponse:
             "candidate_count": len(self.candidates),
             "selected_memory_ids": self.selected_memory_ids,
             "selected_tokens": self.selected_tokens,
+            "search_rounds": self.search_rounds,
+            "scanned_hits": self.scanned_hits,
+            "search_limit": self.search_limit,
+            "scan_limit_reached": self.scan_limit_reached,
             "candidates": [candidate.to_dict() for candidate in self.candidates],
         }
 
@@ -141,36 +155,61 @@ class RetrievalService:
             return RetrievalResponse(query, scope_id, [], [], 0)
 
         query_vector = self._embedding_provider.embed([query])[0]
-        hits = self._vector_index.search(
-            query_vector,
-            scope_id=scope_id,
-            model_id=self._embedding_provider.model_id,
-            memory_types=memory_types,
-            limit=self._config.candidate_limit,
-        )
-
         now = utc_now()
         candidates: list[RetrievalCandidate] = []
         seen_ids: set[str] = set()
-        for hit in hits:
-            if hit.memory_id in seen_ids or not math.isfinite(hit.similarity):
-                continue
-            seen_ids.add(hit.memory_id)
-            memory = self._store.get(hit.memory_id)
-            if memory is None or memory.status is not MemoryStatus.ACTIVE or memory.is_expired(now):
-                continue
-            # Derived index metadata cannot authorize access to the source record.
-            if memory.scope_id != scope_id:
-                continue
-            if memory_types is not None and memory.memory_type not in memory_types:
-                continue
-            candidates.append(
-                RetrievalCandidate(
-                    memory=memory,
-                    score=self._score(memory, hit.similarity, now),
-                    estimated_tokens=estimate_tokens(memory.content),
+        search_limit = self._config.candidate_limit
+        scan_limit = self._config.candidate_scan_limit or max(100_000, search_limit)
+        search_rounds = 0
+        # Stale index rows must not consume the usable metadata candidate budget.
+        # Grow the ranked prefix without changing the vector adapter's public API.
+        while True:
+            hits = self._vector_index.search(
+                query_vector,
+                scope_id=scope_id,
+                model_id=self._embedding_provider.model_id,
+                memory_types=memory_types,
+                limit=search_limit,
+            )[:search_limit]
+            search_rounds += 1
+            for hit in hits:
+                if hit.memory_id in seen_ids or not math.isfinite(hit.similarity):
+                    continue
+                seen_ids.add(hit.memory_id)
+                memory = self._store.get(hit.memory_id)
+                if (
+                    memory is None
+                    or memory.status is not MemoryStatus.ACTIVE
+                    or memory.is_expired(now)
+                ):
+                    continue
+                # Derived index metadata cannot authorize access to the source record.
+                if memory.scope_id != scope_id:
+                    continue
+                if memory_types is not None and memory.memory_type not in memory_types:
+                    continue
+                candidates.append(
+                    RetrievalCandidate(
+                        memory=memory,
+                        score=self._score(memory, hit.similarity, now),
+                        estimated_tokens=estimate_tokens(memory.content),
+                    )
                 )
-            )
+                if len(candidates) >= self._config.candidate_limit:
+                    break
+            if (
+                len(candidates) >= self._config.candidate_limit
+                or len(hits) < search_limit
+                or search_limit >= scan_limit
+            ):
+                break
+            search_limit = min(search_limit * 2, scan_limit)
+
+        scan_limit_reached = (
+            len(candidates) < self._config.candidate_limit
+            and search_limit == scan_limit
+            and len(hits) == search_limit
+        )
 
         candidates.sort(key=lambda candidate: (-candidate.score.final_score, candidate.memory.id))
         selected_ids: list[str] = []
@@ -199,6 +238,10 @@ class RetrievalService:
             candidates=candidates,
             selected_memory_ids=selected_ids,
             selected_tokens=selected_tokens,
+            search_rounds=search_rounds,
+            scanned_hits=len(hits),
+            search_limit=search_limit,
+            scan_limit_reached=scan_limit_reached,
         )
 
     def _score(

@@ -12,8 +12,8 @@ class DatasetTestCase(unittest.TestCase):
 
         dataset = load_dataset(dataset_path)
 
-        self.assertEqual(dataset.version, "1.0.0")
-        self.assertEqual(len(dataset.sequences), 10)
+        self.assertEqual(dataset.version, "2.0.0")
+        self.assertEqual(len(dataset.sequences), 31)
         self.assertTrue(REQUIRED_CATEGORIES.issubset(dataset.categories))
 
 

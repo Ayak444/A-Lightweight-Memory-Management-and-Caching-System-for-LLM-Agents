@@ -1,0 +1,44 @@
+name: Python Checks
+
+on: [push, pull_request]
+
+permissions:
+  contents: read
+
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.11", "3.12"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      - run: python -m pip install -e ".[dev]"
+      - run: python -m ruff check memlite tests experiments
+      - run: python -m ruff format --check memlite tests experiments
+      - run: python -m mypy memlite
+      - run: python -m pytest -q
+      - run: python -m pip wheel . --no-deps --wheel-dir dist/runtime
+      - run: python -m venv dist/install-smoke
+      - run: python -m pip --python dist/install-smoke/bin/python install --no-index --no-deps dist/runtime/*.whl
+      - run: dist/install-smoke/bin/python -I experiments/smoke_installed_runtime.py
+      - run: python -m experiments.package_skill --output dist/memlite-agent-skill.zip
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Install skill with the documented CLI in an isolated project
+        env:
+          DISABLE_TELEMETRY: "1"
+        run: |
+          mkdir -p dist/skill-install-smoke
+          cd dist/skill-install-smoke
+          npx --yes skills@1.7.0 add ../../docs/skills/memlite-agent --skill memlite-agent --agent codex --copy --yes
+      - run: python -m experiments.smoke_installed_skill --skill-directory dist/skill-install-smoke/.agents/skills/memlite-agent
+      - uses: actions/upload-artifact@v4
+        with:
+          name: memlite-agent-skill-python-${{ matrix.python-version }}
+          path: dist/memlite-agent-skill.zip
+          if-no-files-found: error

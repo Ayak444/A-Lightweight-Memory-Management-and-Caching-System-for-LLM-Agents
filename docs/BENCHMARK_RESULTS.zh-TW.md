@@ -1,5 +1,7 @@
 # MemLite-Agent Benchmark Results
 
+> **最新驗證入口（2026-10-05）**：本文件下方的 v1.0.0／10 題數據為歷史紀錄，不代表目前程式。31 題重新驗證見 [研究更新](RESEARCH_UPDATE_20261003.zh-TW.md)；12 個長歷史／多必要事實／eviction 壓力案例見 [受控實驗結果](CHALLENGE_RESULTS_20261003.zh-TW.md)；候選補足修正與 1,224 筆配對 trace 見 [檢索修正驗證](RETRIEVAL_REFILL_20261004.zh-TW.md)。重要性保護的 858 trace、改善與退步見 [保護實驗](IMPORTANCE_PROTECTION_20261005.zh-TW.md)；Agent L2 的 108 trace、必要事實遺失與 TTL 修正見 [壓縮與修正](COMPRESSION_AND_CORRECTION_20261005.zh-TW.md)。資料分布與指標不同時，不能直接比較通過率。
+
 > Run date: 2026-09-13  
 > Dataset: `experiments/datasets/mvp.json` v1.0.0  
 > Scope: 10 sequences / 10 retrieval queries  

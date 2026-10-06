@@ -6,10 +6,16 @@ __pycache__/
 .ruff_cache/
 .coverage
 htmlcov/
+dist/
+build/
 
 .venv/
+.venv-research/
 venv/
 .env
+.env.*
+!.env.example
+.agents/
 
 data/*
 !data/.gitkeep

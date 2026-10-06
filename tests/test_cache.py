@@ -8,7 +8,6 @@ from pathlib import Path
 
 from memlite.cache import (
     CacheEventType,
-    CacheStatus,
     ScopeContext,
     SemanticCache,
 )
@@ -81,9 +80,7 @@ class SemanticCacheDirectTestCase(unittest.TestCase):
             scope_id="demo",
             scope_context=self._ctx,
         )
-        result = self._cache.lookup(
-            "How to make coffee?", scope_id="demo", scope_context=self._ctx
-        )
+        result = self._cache.lookup("How to make coffee?", scope_id="demo", scope_context=self._ctx)
         self.assertEqual(result.event_type, CacheEventType.MISS)
         self.assertIsNone(result.entry)
 
@@ -113,18 +110,15 @@ class SemanticCacheDirectTestCase(unittest.TestCase):
             ttl_seconds=1,
         )
         # Manually expire it in the DB
-        from memlite.models import utc_now
         from datetime import timedelta
 
+        from memlite.models import utc_now
+
         past = (utc_now() - timedelta(seconds=10)).isoformat()
-        self._cache._conn.execute(
-            "UPDATE cache_entries SET expires_at = ?", (past,)
-        )
+        self._cache._conn.execute("UPDATE cache_entries SET expires_at = ?", (past,))
         self._cache._conn.commit()
 
-        result = self._cache.lookup(
-            "Temporary answer", scope_id="demo", scope_context=self._ctx
-        )
+        result = self._cache.lookup("Temporary answer", scope_id="demo", scope_context=self._ctx)
         self.assertEqual(result.event_type, CacheEventType.MISS)
 
     def test_manual_invalidation(self) -> None:
@@ -137,9 +131,7 @@ class SemanticCacheDirectTestCase(unittest.TestCase):
         )
         self.assertTrue(self._cache.invalidate(entry.id))
 
-        result = self._cache.lookup(
-            "What is X?", scope_id="demo", scope_context=self._ctx
-        )
+        result = self._cache.lookup("What is X?", scope_id="demo", scope_context=self._ctx)
         self.assertNotEqual(result.event_type, CacheEventType.HIT)
 
     def test_scope_invalidation(self) -> None:
@@ -159,7 +151,9 @@ class SemanticCacheDirectTestCase(unittest.TestCase):
         """Stats should accurately track hits, misses, and stores."""
         self._cache.store("Q", "A", scope_id="demo", scope_context=self._ctx)
         self._cache.lookup("Q", scope_id="demo", scope_context=self._ctx)  # hit
-        self._cache.lookup("Unknown query topic X Y Z", scope_id="demo", scope_context=self._ctx)  # miss
+        self._cache.lookup(
+            "Unknown query topic X Y Z", scope_id="demo", scope_context=self._ctx
+        )  # miss
 
         stats = self._cache.stats()
         self.assertEqual(stats.active_entries, 1)

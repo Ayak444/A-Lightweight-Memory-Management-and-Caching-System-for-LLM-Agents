@@ -4,24 +4,59 @@ import csv
 import json
 import statistics
 import tempfile
-from dataclasses import dataclass
+from dataclasses import asdict, dataclass
+from hashlib import sha256
 from pathlib import Path
 from time import perf_counter
 from typing import Any
+from uuid import uuid4
 
 from memlite.engine import MemLiteEngine
 from memlite.evaluation.datasets import BenchmarkSequence, load_dataset
+from memlite.evaluation.environment import save_environment
+from memlite.evaluation.run_log import Metric, RetrievalEvent, Run, RunLogStore
+from memlite.evaluation.summary import save_summary
 from memlite.models import MemoryType
-from memlite.policies.retrieval import RetrievalConfig
+from memlite.policies.retrieval import RetrievalConfig, estimate_tokens
 
 
 @dataclass(frozen=True, slots=True)
 class StrategySpec:
     name: str
     config: RetrievalConfig
+    history_window: int | None = None
 
 
 STRATEGIES = (
+    StrategySpec(
+        name="B0_full_history",
+        config=RetrievalConfig(
+            candidate_limit=99999,
+            max_results=99999,
+            token_budget=999999,
+            min_similarity=0.0,
+            similarity_weight=0.0,
+            recency_weight=1.0,
+            importance_weight=0.0,
+            confidence_weight=0.0,
+            frequency_weight=0.0,
+        ),
+    ),
+    StrategySpec(
+        name="B1_recent_window",
+        history_window=10,
+        config=RetrievalConfig(
+            candidate_limit=99999,
+            max_results=10,
+            token_budget=1024,
+            min_similarity=0.0,
+            similarity_weight=0.0,
+            recency_weight=1.0,
+            importance_weight=0.0,
+            confidence_weight=0.0,
+            frequency_weight=0.0,
+        ),
+    ),
     StrategySpec(
         name="similarity_only_top5",
         config=RetrievalConfig(
@@ -50,11 +85,15 @@ def run_comparisons(
     dataset = load_dataset(dataset_path)
     output_directory = Path(output_directory)
     output_directory.mkdir(parents=True, exist_ok=True)
+    experiment_id = str(uuid4())
 
-    with tempfile.TemporaryDirectory(prefix="memlite-comparison-") as temporary_directory:
+    with (
+        tempfile.TemporaryDirectory(prefix="memlite-comparison-") as temporary_directory,
+        RunLogStore(output_directory / "runs.db") as run_log,
+    ):
         work_directory = Path(temporary_directory)
         strategy_results = [
-            _evaluate_strategy(dataset.sequences, strategy, work_directory)
+            _evaluate_strategy(dataset.sequences, strategy, work_directory, run_log, experiment_id)
             for strategy in STRATEGIES
         ]
         token_budget_results = [
@@ -65,6 +104,8 @@ def run_comparisons(
                     config=RetrievalConfig(token_budget=budget, max_results=5),
                 ),
                 work_directory,
+                run_log,
+                experiment_id,
             )
             | {"token_budget": budget}
             for budget in (8, 16, 32, 64, 128, 500)
@@ -73,11 +114,16 @@ def run_comparisons(
 
     report = {
         "dataset_version": dataset.version,
+        "dataset_sha256": sha256(Path(dataset_path).read_bytes()).hexdigest(),
+        "experiment_id": experiment_id,
         "dataset_sequences": len(dataset.sequences),
         "strategy_comparison": strategy_results,
         "token_budget_comparison": token_budget_results,
         "corpus_latency_comparison": latency_results,
         "notes": [
+            "B0 uses raw memory-write history; B1 uses the last 10 writes per scope.",
+            "History baselines include replaced facts; they bypass vector scoring and dedup.",
+            "Pass rate measures retrieval constraints, not LLM answer quality.",
             "All figures use the deterministic lexical embedding baseline.",
             "Latency excludes remote embedding and LLM calls.",
             "Results describe the current offline prototype, not production performance.",
@@ -90,6 +136,8 @@ def run_comparisons(
     _write_csv(output_directory / "strategy_comparison.csv", strategy_results)
     _write_csv(output_directory / "token_budget_comparison.csv", token_budget_results)
     _write_csv(output_directory / "corpus_latency_comparison.csv", latency_results)
+    save_environment(output_directory / "environment.json", Path.cwd())
+    save_summary(output_directory)
     return report
 
 
@@ -97,6 +145,8 @@ def _evaluate_strategy(
     sequences: list[BenchmarkSequence],
     strategy: StrategySpec,
     work_directory: Path,
+    run_log: RunLogStore | None = None,
+    experiment_id: str = "",
 ) -> dict[str, Any]:
     precisions: list[float] = []
     recalls: list[float] = []
@@ -104,6 +154,18 @@ def _evaluate_strategy(
     passes: list[bool] = []
     selected_tokens: list[int] = []
     latencies: list[float] = []
+    run_id = str(uuid4())
+    if run_log is not None:
+        run_log.create_run(
+            Run(
+                id=run_id,
+                experiment_id=experiment_id,
+                strategy=strategy.name,
+                config=asdict(strategy.config) | {"history_window": strategy.history_window},
+                model="deterministic-hash",
+                status="running",
+            )
+        )
 
     for sequence in sequences:
         database_path = work_directory / f"{strategy.name}-{sequence.sequence_id}.db"
@@ -111,12 +173,35 @@ def _evaluate_strategy(
             key_by_id = _populate(engine, sequence)
             for query in sequence.queries:
                 started = perf_counter()
-                response = engine.retrieve(
-                    str(query["input"]),
-                    scope_id=str(query.get("scope", sequence.sequence_id)),
-                )
-                latencies.append((perf_counter() - started) * 1_000)
-                selected = [key_by_id[memory_id] for memory_id in response.selected_memory_ids]
+                query_text = str(query["input"])
+                scope_id = str(query.get("scope", sequence.sequence_id))
+                if strategy.name in {"B0_full_history", "B1_recent_window"}:
+                    selected, token_count = _select_history(sequence, strategy, scope_id)
+                    latencies.append((perf_counter() - started) * 1_000)
+                else:
+                    response = engine.retrieve(query_text, scope_id=scope_id)
+                    selected = [key_by_id[mid] for mid in response.selected_memory_ids]
+                    token_count = response.selected_tokens
+                    latencies.append((perf_counter() - started) * 1_000)
+                    if run_log is not None:
+                        for candidate in response.candidates:
+                            run_log.log_retrieval_event(
+                                RetrievalEvent(
+                                    run_id=run_id,
+                                    query=query_text,
+                                    memory_id=candidate.memory.id,
+                                    estimated_tokens=candidate.estimated_tokens,
+                                    selected=candidate.selected,
+                                    rejection_reason=candidate.rejection_reason,
+                                    similarity=candidate.score.similarity,
+                                    recency=candidate.score.recency,
+                                    importance=candidate.score.importance,
+                                    confidence=candidate.score.confidence,
+                                    frequency=candidate.score.frequency,
+                                    pollution_penalty=candidate.score.pollution_penalty,
+                                    final_score=candidate.score.final_score,
+                                )
+                            )
                 expected = {str(key) for key in query["expected_memory_keys"]}
                 forbidden = {str(key) for key in query.get("forbidden_memory_keys", [])}
                 selected_set = set(selected)
@@ -127,9 +212,9 @@ def _evaluate_strategy(
                 passes.append(
                     expected.issubset(selected_set) and selected_set.isdisjoint(forbidden)
                 )
-                selected_tokens.append(response.selected_tokens)
+                selected_tokens.append(token_count)
 
-    return {
+    result = {
         "strategy": strategy.name,
         "queries": len(passes),
         "pass_rate": statistics.fmean(passes),
@@ -140,6 +225,41 @@ def _evaluate_strategy(
         "latency_ms_p50": statistics.median(latencies),
         "latency_ms_p95": _percentile(latencies, 0.95),
     }
+    if run_log is not None:
+        for name, value in result.items():
+            if isinstance(value, (float, int)):
+                run_log.log_metric(Metric(run_id=run_id, metric_name=name, value=float(value)))
+        run_log.finish_run(run_id)
+    return result
+
+
+def _select_history(
+    sequence: BenchmarkSequence,
+    strategy: StrategySpec,
+    scope_id: str,
+) -> tuple[list[str], int]:
+    scopes: dict[str, str] = {}
+    history: list[tuple[str, str]] = []
+    for raw in sequence.memories:
+        key = str(raw["key"])
+        previous = raw.get("supersedes")
+        memory_scope = (
+            scopes[str(previous)] if previous else str(raw.get("scope", sequence.sequence_id))
+        )
+        scopes[key] = memory_scope
+        if memory_scope == scope_id:
+            history.append((key, str(raw["content"])))
+    if strategy.history_window is not None:
+        history = history[-strategy.history_window :]
+    # Recent-first fits the window budget; restore chronological prompt order.
+    selected: list[tuple[str, str]] = []
+    for item in reversed(history):
+        if estimate_tokens("\n".join(content for _, content in [item, *selected])) <= (
+            strategy.config.token_budget
+        ):
+            selected.insert(0, item)
+    text = "\n".join(content for _, content in selected)
+    return [key for key, _ in selected], estimate_tokens(text) if selected else 0
 
 
 def _populate(engine: MemLiteEngine, sequence: BenchmarkSequence) -> dict[str, str]:

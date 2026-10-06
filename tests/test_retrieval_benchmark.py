@@ -11,7 +11,7 @@ class RetrievalBenchmarkTestCase(unittest.TestCase):
         result = run_retrieval_benchmark(Path("experiments/datasets/mvp.json"))
         summary = result.summary()
 
-        self.assertEqual(summary["queries"], 10)
+        self.assertEqual(summary["queries"], 31)
         for metric in ("pass_rate", "mean_precision", "mean_recall", "mean_reciprocal_rank"):
             self.assertGreaterEqual(summary[metric], 0.0)
             self.assertLessEqual(summary[metric], 1.0)

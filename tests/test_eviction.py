@@ -9,7 +9,7 @@ from pathlib import Path
 
 from memlite.engine import MemLiteEngine
 from memlite.manager import MemoryManager
-from memlite.models import MemoryItem, MemoryStatus, MemoryType, utc_now
+from memlite.models import MemoryItem, MemoryType, utc_now
 from memlite.policies.eviction import (
     HybridEviction,
     LFUEviction,

@@ -14,6 +14,7 @@ from memlite.models import MemoryItem, MemoryStatus, MemoryType, SourceType
 from memlite.policies.eviction import (
     EvictionResult,
     HybridEviction,
+    ImportanceProtectedEviction,
     LFUEviction,
     LRUEviction,
     TTLEviction,
@@ -28,6 +29,7 @@ __all__ = [
     "CacheStatus",
     "EvictionResult",
     "HybridEviction",
+    "ImportanceProtectedEviction",
     "LFUEviction",
     "LRUEviction",
     "MemoryItem",

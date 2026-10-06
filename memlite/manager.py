@@ -86,6 +86,8 @@ class MemoryManager:
             raise MemoryNotFoundError(f"active memory not found: {memory_id}")
 
         now = utc_now()
+        if previous.is_expired(now):
+            raise ValueError("expired memory cannot be superseded; create a new memory")
         replacement = MemoryItem(
             memory_type=previous.memory_type,
             scope_id=previous.scope_id,
@@ -94,6 +96,7 @@ class MemoryManager:
             source_ref=source_ref,
             importance=previous.importance if importance is None else importance,
             confidence=previous.confidence if confidence is None else confidence,
+            expires_at=previous.expires_at,
             metadata=dict(previous.metadata if metadata is None else metadata),
             created_at=now,
             updated_at=now,

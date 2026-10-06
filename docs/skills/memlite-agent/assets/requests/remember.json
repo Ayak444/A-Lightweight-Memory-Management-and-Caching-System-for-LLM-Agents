@@ -1,0 +1,9 @@
+{
+  "operation": "remember",
+  "scope": "project:memlite-demo",
+  "type": "semantic",
+  "content": "本專案使用 SQLite 儲存記憶。",
+  "source": "user",
+  "source_ref": "使用教學示範",
+  "confidence": 1.0
+}

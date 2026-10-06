@@ -5,7 +5,6 @@ These never call any remote API and produce repeatable results.
 
 from __future__ import annotations
 
-import hashlib
 import math
 
 from memlite.providers import CompletionRequest, CompletionResult
@@ -29,9 +28,7 @@ class FakeLLMProvider:
                 break
 
         response_content = f"[fake-response] Acknowledged: {last_user_message[:80]}"
-        input_tokens = sum(
-            _estimate_tokens(msg.get("content", "")) for msg in request.messages
-        )
+        input_tokens = sum(_estimate_tokens(msg.get("content", "")) for msg in request.messages)
         output_tokens = _estimate_tokens(response_content)
 
         return CompletionResult(

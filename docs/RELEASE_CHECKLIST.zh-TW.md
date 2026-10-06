@@ -17,13 +17,14 @@
 - [x] README 一行 `npx skills@1.7.0` 安裝入口、本地 CLI 安裝驗收、八檔完整性及三步操作 smoke；CI 包含相同驗收。
 - [x] cache hit 抽取、L3 額外呼叫／成功用量與配額錯扣修正，138 tests／62 subtests 通過，lint／format 已修復。
 - [x] UTF-8 demo 文字修復；本機 skill 先備份再同步，最新 wheel 在新隔離環境驗證 L3 與抽取。
-- [ ] private repo push 後驗證遠端 CI 與 artifact；目前沒有遠端成功證據。
+- [x] 已 push 並驗證提交 `19ac1ed` 的遠端 Python 3.11／3.12 CI 與兩個 skill artifacts；[run 37480162794](https://github.com/Ayak444/A-Lightweight-Memory-Management-and-Caching-System-for-LLM-Agents/actions/runs/37480162794) 成功。
+- [x] GitHub 公開 URL 乾淨 clone、官方 CLI skill 下載／安裝、八檔完整性及 remember／retrieve／list 通過；未覆蓋本機全域 skill。
 - [ ] 使用另一台機器或乾淨環境，從 GitHub 安裝 runtime 與 skill，跑完整教學。
 - [ ] 檢查所有待發布檔案與 Git 歷史，確認沒有金鑰、個資、私有筆記、授權不明素材。
 - [ ] 對版本打 tag 並建立 GitHub Release，上傳 ZIP 與公布 checksum（需維護者授權）。
 - [ ] 使用無 repo 權限的訪客核對下載；只有維護者確定完成後才轉 public。
 
-本機產物只代表可交付的離線包，不代表 GitHub 上已可下載。官方現行建議將可重用分發包製成 plugin；本版先提供使用者要求的 standalone skill，可由 `$skill-installer` 安裝。plugin registry / marketplace 上架不是本輪成果。
+GitHub 已可下載原始碼並以 npx 安裝 skill，遠端 CI artifact 已產出；尚未建立 Release。官方現行建議將可重用分發包製成 plugin；本版先提供使用者要求的 standalone skill，可由 npx 或 `$skill-installer` 安裝。plugin registry / marketplace 上架不是本輪成果。
 
 本輪 wheel 在另一個新建 venv 中以 `--no-index --no-deps` 安裝，隔離模式確認從該環境的 site-packages 匯入，沒有靠 editable checkout 才通過。這驗證離線核心與 JSON bridge；沒有安裝第三方依賴，不能說已完成 API／OpenAI adapter 的乾淨環境驗收。完整使用者安裝仍需依安裝教學取得依賴。
 

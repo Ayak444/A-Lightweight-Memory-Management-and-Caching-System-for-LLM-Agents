@@ -10,7 +10,7 @@
 
 > **2026-10-06 修正與校正**：審查發現的 cache hit 抽取、L3 額外呼叫／用量與無效請求扣款已修正，138 tests／62 subtests 通過，lint／format／typing 通過，demo UTF-8 已修復。研究品質與展示缺口仍未驗收；下方 M2/M3/M4 校正為進行中。剩餘六項所需資料、預算與權限見 [修正與條件](docs/FIXES_AND_REQUIREMENTS_20261006.zh-TW.md)。
 
-> **2026-10-06 發布準備更新**：使用者授權 commit／push，補上一行 npx skill 安裝、安裝後檔案及操作驗收與 CI 步驟。pytest 139 tests／62 subtests 通過。GitHub metadata 顯示 repo 已為 public，本輪沒有更改 visibility；先前 private／未 push 敘述保留作歷史，不代表現況。實際 push 與遠端安裝結果記於文末。
+> **2026-10-06 GitHub 更新**：已依使用者授權 commit／push，補上一行 npx skill 安裝、安裝後檔案及操作驗收與 CI 步驟。pytest 139 tests／62 subtests 通過；提交 `19ac1ed` 的遠端 Python 3.11／3.12 CI、wheel 安裝、skill 安裝與 artifact 產出全數成功。GitHub metadata 顯示 repo 已為 public，本輪沒有更改 visibility；先前 private／未 push 敘述保留作歷史，不代表現況。實際 push 與遠端安裝結果記於文末。
 
 ---
 
@@ -28,7 +28,7 @@
 
 | Milestone | 名稱 | 狀態 | 說明 |
 |-----------|------|------|------|
-| M0 | 定義與骨架 | ✅ 完成 | repo、domain models、fake providers；已加入 CI 定義，遠端執行待 push |
+| M0 | 定義與骨架 | ✅ 完成 | repo、domain models、fake providers；Python 3.11／3.12 遠端 CI 已通過 |
 | M1 | 可用的 Memory Manager | ✅ 完成 | SQLite schema、CRUD、向量檢索、trace |
 | M2 | Compression 與 Semantic Cache | 🔧 進行中 | L2/L3 整合與用量／快取回歸已驗證；真實摘要品質與污染仍待驗收 |
 | M3 | Evaluation | 🔧 進行中 | 離線 retrieval／cache／eviction／壓縮可重現；獨立資料與真實品質、費用尚未完成 |
@@ -365,3 +365,12 @@ docs/
 - 排除本機 `.agents/`、`.env.*`（保留 `.env.example`）、資料庫與 dist；工作目錄 133 個候選檔案及原有一個 commit 的常見 credential pattern 掃描無命中。這不是完整個資／授權稽核：Git 歷史原已包含 `.codex/config.toml` 的本機路徑；本輪不更改既有設定或宣稱已完成公開前全面審查。
 - 遠端 main 與本機 HEAD 原本一致；GitHub metadata 顯示 public，沒有修改 visibility、建立 Release 或部署 API。push 與遠端安裝驗收將在完成後追加；研究品質、Docker 與完整簡報尚未完成。
 - 安裝教學更新後的新 ZIP：`dist/memlite-agent-skill-0.1.0-install-20261006.zip`，11 檔，SHA-256 `b656dbb4e5a49db2e4c56bd26ebd0a305d4a2acdfdbbfcc9239b0035260a92e8`。ZIP 在本機保留，不自動建立 Release 或提交建置產物。
+
+### 遠端驗收結果
+
+- 已提交並 push `19ac1ed7487f06d030e308635926cb8bac205c72` 至 origin/main，`git ls-remote` 與本機 SHA 一致；沒有 force push、改 visibility、建立 Release。
+- 用停用 Git credential helper 的全新 clone 下載公開 repo 到 `dist/github-clean-20261006/`；再以 README 的 GitHub tree URL、`skills@1.7.0` 安裝到 `dist/github-skill-install-20261006/`。為避免覆蓋既有全域 skill，驗收只將目的地由 global 改成 project-level；沒有宣稱在作者全域目錄重裝或完成獨立 Agent 行為評估。
+- 對遠端下載的副本驗證八個檔案 byte match、跨目錄 remember／retrieve／list 全數成功；scope／UTF-8 教學可執行，沒有呼叫模型 API。完整教學的修正／忘記流程已有測試覆蓋，但另一台實體機器的人工教學驗收仍未做。
+- [GitHub Actions run 37480162794](https://github.com/Ayak444/A-Lightweight-Memory-Management-and-Caching-System-for-LLM-Agents/actions/runs/37480162794) completed/success；Python 3.11／3.12 各完成依賴安裝、lint／format／typing、完整測試、wheel build、全新 venv 的隔離 wheel smoke、skill ZIP 封裝、官方 CLI 安裝及操作 smoke。
+- 遠端已產生 `memlite-agent-skill-python-3.11`、`memlite-agent-skill-python-3.12` 兩個未過期 artifacts，各 11,440 bytes（GitHub artifact 外層包）。這不是 GitHub Release，也不將 artifact 外層 digest 當成內容 ZIP 的 SHA-256；保存期限與下載登入規則由 GitHub 決定。
+- 安裝驗收測試再次 7/7 通過，skill-creator 格式驗證通過。原始提交後，本段文件另作驗收紀錄 commit；上述 CI 成功證據明確對應 `19ac1ed`，不預先宣稱後續文件提交的 CI 結果。

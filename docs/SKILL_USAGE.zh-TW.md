@@ -50,6 +50,8 @@ npx --yes skills@1.7.0 list --global --agent codex
 
 只有 skill 檔案會被安裝，Python 引擎與依賴不會自動下載。完成第 1 節的 runtime 安裝後，在 Codex 開啟 checkout，使用 `$memlite-agent` 開始第 3 節教學。未偵測到時重啟 Codex；不要再於另一個技能目錄安裝同名副本。從 main 安裝會取得當下版本，不是固定 Release。
 
+現行 [OpenAI 本地技能文件](https://learn.chatgpt.com/docs/build-skills) 列出 `~/.agents/skills/`，與此第三方 CLI 的 global 目的地不同。若你的 Codex 不載入 CLI 的 global 目錄，請先比較／移除原副本，再於 runtime checkout 執行同一指令但刪除 `--global`；會安裝到官方列出的 `.agents/skills/`，或採下方手動安裝。不要同時保留兩份同名 skill。本輪遠端驗收採 project-level 安裝，global 目錄未重裝。
+
 ### 方法 B：請 Codex 從 GitHub 安裝
 
 直接送出這段訊息；private repo 需先有 Git 存取權，不要把 token 貼到對話中：
@@ -198,6 +200,6 @@ JSON 協定與範例請見 [memory protocol](skills/memlite-agent/references/mem
 python -m experiments.package_skill --output dist/memlite-agent-skill.zip
 ```
 
-同一路徑已存在時會拒絕覆蓋，改用新版本檔名。輸出包含 ZIP SHA-256；相同輸入與相同 Python/zlib 環境會產生相同位元組。封裝不帶 live 記憶、API key、實驗資料庫或 Python 引擎。GitHub CI 已加入封裝 artifact 定義，但遠端執行與 Release 上傳仍需另行驗收。發行前清單見 [RELEASE_CHECKLIST.zh-TW.md](RELEASE_CHECKLIST.zh-TW.md)。
+同一路徑已存在時會拒絕覆蓋，改用新版本檔名。輸出包含 ZIP SHA-256；相同輸入與相同 Python/zlib 環境會產生相同位元組。封裝不帶 live 記憶、API key、實驗資料庫或 Python 引擎。提交 `19ac1ed` 的遠端 CI 已通過並產生 Python 3.11／3.12 artifacts，Release 尚未建立；驗收證據見 [PROGRESS](../PROGRESS.md)，發行前清單見 [RELEASE_CHECKLIST.zh-TW.md](RELEASE_CHECKLIST.zh-TW.md)。
 
 runtime wheel 可用 `python -m pip wheel . --no-deps --wheel-dir dist/runtime` 建置；CI 另有全新環境的離線核心安裝 smoke test。`experiments/smoke_installed_runtime.py` 須以安裝 wheel 的 Python 隔離模式執行，用於檢查實際匯入安裝包，而不是 editable source；不驗證尚未安裝的 API 第三方依賴。
